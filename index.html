@@ -208,6 +208,9 @@ input:focus,select:focus,textarea:focus{border-color:var(--pandan);outline:none}
 const API_URL = 'https://script.google.com/macros/s/AKfycbxWXi3LDOOT-x1nIlx1usibbzeGRV1KR_mws8euMFdZ-d91CDzrOuWccZ4OGgs6X4avdw/exec';
 const HARI = ['senin','selasa','rabu','kamis','jumat','sabtu','minggu'];
 const NAMA_HARI = ['Senin','Selasa','Rabu','Kamis','Jumat','Sabtu','Minggu'];
+// Nomor versi aplikasi: NAIKKAN setiap commit baru, supaya link di WhatsApp selalu memuat versi terbaru
+const APP_VERSION = 10;
+const shareUrl = () => location.origin + location.pathname + '?v=' + APP_VERSION + '#/';
 
 /* ===== Util ===== */
 const $ = (s, el=document) => el.querySelector(s);
@@ -563,7 +566,7 @@ function showPhoto(m){
 
 function waMessage(storeName, nama){
   const open = (ALL ? ALL.stores : []).filter(x => x.buka);
-  const url = location.origin + location.pathname;
+  const url = shareUrl();
   const parts = [`🍱 Pre-Order Besok (${preorderLabel()})`, `${nama} sudah pesan di ${storeName} ✅`, '', 'Toko yang buka hari ini :'];
   open.forEach((t, i) => {
     parts.push(`${i+1}. *${t.nama}*`);
