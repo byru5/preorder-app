@@ -129,6 +129,22 @@ input:focus,select:focus,textarea:focus{border-color:var(--pandan);outline:none}
 .cartbar small{opacity:.8;display:block}
 .cartbar b{font-size:1.15rem}
 .cartbar .btn{background:var(--kunyit);color:var(--ink)}
+.po-day{display:flex;align-items:center;gap:8px;background:var(--pandan);color:#fff;border-radius:var(--r-sm);padding:10px 14px;margin:14px 0 4px;font-size:.95rem}
+.recap{position:fixed;inset:0;z-index:25;background:rgba(15,22,17,.55);display:flex;align-items:flex-end;justify-content:center}
+.recap .box{background:var(--paper);width:100%;max-width:560px;max-height:90vh;overflow:auto;border-radius:22px 22px 0 0;padding:20px 18px calc(20px + env(safe-area-inset-bottom,0px))}
+@media(min-width:700px){.recap{align-items:center}.recap .box{border-radius:22px}}
+.recap h2{margin:0 0 2px;font-size:1.3rem}
+.recap .sub{color:var(--muted);margin:0 0 12px;font-size:.92rem}
+.recap .card{background:var(--card);border:1.5px solid var(--line);border-radius:var(--r-sm);padding:12px 14px;margin-bottom:10px}
+.recap .line{display:flex;justify-content:space-between;gap:12px;padding:4px 0}
+.recap .tot{border-top:1.5px dashed var(--line);margin-top:6px;padding-top:8px;font-weight:800;font-size:1.05rem}
+.recap .kv{font-size:.92rem;padding:2px 0}
+.recap .kv span{color:var(--muted)}
+.recap .actions{display:flex;gap:10px;margin-top:14px}
+.recap .actions .btn{flex:1}
+.btn.wa{background:#1FA855;color:#fff;width:100%;display:flex;align-items:center;justify-content:center;gap:8px;font-size:1.02rem}
+.btn.wa:hover{background:#178a45}
+.share-note{color:var(--muted);font-size:.88rem;margin:8px 0 14px}
 .done{text-align:center;padding:40px 10px}
 .done .tick{width:72px;height:72px;border-radius:50%;background:var(--leaf);color:var(--pandan);font-size:2.2rem;display:flex;align-items:center;justify-content:center;margin:0 auto 16px}
 .receipt{background:var(--card);border:1.5px solid var(--line);border-radius:var(--r-lg);padding:16px;text-align:left;margin:20px 0}
@@ -247,11 +263,20 @@ function saveAll(){ try { localStorage.setItem('po_all', JSON.stringify(ALL)); }
 function refreshAll(){
   if (allPromise) return allPromise;
   allPromise = api('getAll').then(d => {
-    ALL = { stores: d.stores, menus: d.menus, at: Date.now() }; saveAll(); preloadPhotos(); return ALL;
+    ALL = { stores: d.stores, menus: d.menus, po: d.preorder || null, at: Date.now() }; saveAll(); preloadPhotos(); return ALL;
   }).finally(() => { allPromise = null; });
   return allPromise;
 }
 const allFresh = (ms=30000) => ALL && Date.now() - ALL.at < ms;
+const BLN = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+const HARI_ID = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
+function labelTanggal(iso){ if (!iso) return ''; const [y,m,d] = iso.split('-').map(Number); const dt = new Date(y, m-1, d); return HARI_ID[dt.getDay()] + ', ' + d + ' ' + BLN[m-1]; }
+// Tanggal pre-order = hari kerja berikutnya (Jumat/Sabtu/Minggu -> Senin). Utamakan data server.
+function preorderLabel(){
+  if (ALL && ALL.po && ALL.po.label) return ALL.po.label;
+  const t = new Date(); const add = {5:3, 6:2}[t.getDay()] || 1; t.setDate(t.getDate() + add);
+  return HARI_ID[t.getDay()] + ', ' + t.getDate() + ' ' + BLN[t.getMonth()];
+}
 function thumb(url, w){ return url ? url.replace(/sz=w\d+/, 'sz=w' + w) : url; }
 let preloaded = {};
 function preloadPhotos(){
@@ -390,6 +415,7 @@ function renderStore(data){
       ${s.deskripsi?`<p>${esc(s.deskripsi)}</p>`:''}
       <span class="pill open">${esc(s.info)}</span>
     </header>
+    <div class="po-day">📅 <span>Pre-order untuk <b>${esc(preorderLabel())}</b></span></div>
     ${(s.batas_pesan||s.waktu_ambil)?`<div class="po">
       <div><small>Pesan paling lambat</small><b>${s.batas_pesan?esc(fmtWaktu(s.batas_pesan)):'Tidak dibatasi'}</b></div>
       <div><small>Waktu pengambilan</small><b>${s.waktu_ambil?esc(fmtWaktu(s.waktu_ambil)):'Menyusul'}</b></div>
@@ -458,20 +484,54 @@ function renderStore(data){
     st.querySelector('.plus').onclick = () => { qty[id] = (qty[id]||0) + 1; out.textContent = qty[id]; update(); };
     st.querySelector('.minus').onclick = () => { qty[id] = Math.max(0,(qty[id]||0) - 1); out.textContent = qty[id]; update(); };
   });
-  $('#send').onclick = async () => {
+  $('#send').onclick = () => {
     const nama = $('#nama').value.trim();
-    if (!nama){ $('#oe').textContent = 'Isi nama dulu supaya pesanan bisa dikenali.'; $('#nama').focus(); return; }
-    const items = Object.entries(qty).filter(([,v])=>v>0).map(([k,q])=>{ const [id, varian_id] = k.split('|'); return { id, varian_id, qty:q }; });
-    const b = $('#send'); b.disabled = true; b.textContent = 'Mengirim…'; $('#oe').textContent = '';
-    try {
-      const res = await api('placeOrder', { id_toko: s.id, nama, catatan: $('#cat').value.trim(), items });
-      store.set('po_nama', nama);
-      markOrdered(s.id); refreshAll().catch(()=>{});
-      viewDone(s, res, nama);
-    } catch(err){
-      $('#oe').textContent = err.message; b.disabled = false; b.textContent = 'Kirim pesanan';
-      $('#oe').scrollIntoView({ block:'center' });
-    }
+    if (!nama){ $('#oe').textContent = 'Isi nama dulu supaya pesanan bisa dikenali.'; $('#nama').focus(); $('#nama').scrollIntoView({ block:'center' }); return; }
+    $('#oe').textContent = '';
+    const catatan = $('#cat').value.trim();
+    const lines = [];
+    Object.entries(qty).filter(([,v])=>v>0).forEach(([k,q]) => {
+      const [mid, vid] = k.split('|'); const m = menus.find(x => x.id === mid); if (!m) return;
+      const v = vid ? (m.varian||[]).find(x => x.id === vid) : null;
+      lines.push({ id: mid, varian_id: vid, qty: q, nama: m.nama + (v ? ' (' + v.nama + ')' : ''), harga: v ? v.harga : m.harga });
+    });
+    const total = lines.reduce((a,l) => a + l.qty*l.harga, 0);
+    const box = document.createElement('div'); box.className = 'recap';
+    box.innerHTML = `<div class="box" role="dialog" aria-modal="true" aria-labelledby="rc-t">
+      <h2 id="rc-t">Rekap pesanan</h2>
+      <p class="sub">${esc(s.nama)} · Pre-order untuk ${esc(preorderLabel())}</p>
+      <div class="card">
+        ${lines.map(l => `<div class="line"><span>${l.qty}× ${esc(l.nama)}</span><span>${rp(l.qty*l.harga)}</span></div>`).join('')}
+        <div class="line tot"><span>Total</span><span>${rp(total)}</span></div>
+      </div>
+      <div class="card">
+        <div class="kv"><span>Nama:</span> <b>${esc(nama)}</b></div>
+        ${catatan ? `<div class="kv"><span>Catatan:</span> ${esc(catatan)}</div>` : ''}
+        ${s.waktu_ambil ? `<div class="kv"><span>Ambil:</span> ${esc(fmtWaktu(s.waktu_ambil))}</div>` : ''}
+      </div>
+      <div class="err" id="rc-e"></div>
+      <div class="actions">
+        <button type="button" class="btn ghost" id="rc-back">Ubah</button>
+        <button type="button" class="btn" id="rc-send">Kirim</button>
+      </div></div>`;
+    document.body.appendChild(box);
+    const close = () => box.remove();
+    box.addEventListener('click', e => { if (e.target === box && !sending) close(); });
+    $('#rc-back', box).onclick = close;
+    let sending = false;
+    $('#rc-send', box).onclick = async () => {
+      const b = $('#rc-send', box); sending = true; b.disabled = true; $('#rc-back', box).disabled = true; b.textContent = 'Mengirim…'; $('#rc-e', box).textContent = '';
+      try {
+        const res = await api('placeOrder', { id_toko: s.id, nama, catatan, items: lines.map(l => ({ id: l.id, varian_id: l.varian_id, qty: l.qty })) });
+        store.set('po_nama', nama);
+        if (res.preorder && ALL) { ALL.po = res.preorder; }
+        markOrdered(s.id); refreshAll().catch(()=>{});
+        close(); viewDone(s, res, nama);
+      } catch(err){
+        sending = false; b.disabled = false; $('#rc-back', box).disabled = false; b.textContent = 'Kirim'; $('#rc-e', box).textContent = err.message;
+      }
+    };
+    $('#rc-send', box).focus();
   };
 }
 
@@ -491,8 +551,23 @@ function showPhoto(m){
   box.querySelector('.close').focus();
 }
 
+function waMessage(storeName, nama){
+  const open = (ALL ? ALL.stores : []).filter(x => x.buka);
+  const url = location.origin + location.pathname;
+  const parts = [`🍱 Pre-Order Besok (${preorderLabel()})`, `${nama} sudah pesan di ${storeName} ✅`, '', 'Toko yang buka hari ini :'];
+  open.forEach((t, i) => {
+    parts.push(`${i+1}. *${t.nama}*`);
+    if (t.deskripsi) parts.push(`_${t.deskripsi}_`);
+    if (t.tutup) parts.push(`buka s/d ${t.tutup.replace(':', '.')}`);
+    parts.push('');
+  });
+  parts.push(`Yuk ikut pesan 👉 ${url}`);
+  return parts.join('\n');
+}
+
 function viewDone(s, res, nama){
   window.scrollTo(0,0);
+  const po = (res.preorder && res.preorder.label) || preorderLabel();
   app.innerHTML = `
   <div class="wrap">
     <section class="done">
@@ -501,14 +576,24 @@ function viewDone(s, res, nama){
       <p style="color:var(--muted);margin:0">Terima kasih, ${esc(nama)}. ${esc(s.nama)} sekarang pindah ke urutan paling bawah.</p>
       <div class="receipt">
         <div class="line"><span>No. pesanan</span><b>${esc(res.id)}</b></div>
+        <div class="line"><span>Pre-order untuk</span><b>${esc(po)}</b></div>
         ${res.waktu_ambil?`<div class="line"><span>Ambil</span><b>${esc(fmtWaktu(res.waktu_ambil))}</b></div>`:''}
         <div style="height:8px"></div>
         ${res.items.map(i=>`<div class="line"><span>${i.qty}× ${esc(i.nama)}</span><span>${rp(i.qty*i.harga)}</span></div>`).join('')}
         <div class="line tot"><span>Total</span><span>${rp(res.total)}</span></div>
       </div>
-      <button class="btn" onclick="location.hash==='#/'?route():go('/')">Kembali ke daftar toko</button>
+      <button class="btn wa" id="wa">Bagikan ke grup WhatsApp</button>
+      <p class="share-note">Kabari teman-teman di grup supaya mereka ikut pesan. Pilih grupnya setelah WhatsApp terbuka.</p>
+      <button class="btn ghost" id="copy" style="width:100%;margin-bottom:10px">Salin pesan</button>
+      <button class="link" onclick="location.hash==='#/'?route():go('/')">Kembali ke daftar toko</button>
     </section>
   </div>`;
+  const msg = () => waMessage(s.nama, nama);
+  $('#wa').onclick = () => { window.open('https://wa.me/?text=' + encodeURIComponent(msg()), '_blank'); };
+  $('#copy').onclick = async () => {
+    try { await navigator.clipboard.writeText(msg()); toast('Pesan disalin. Tempel di grup WhatsApp.'); }
+    catch(e){ prompt('Salin pesan ini:', msg()); }
+  };
 }
 
 /* ===== Admin ===== */
@@ -619,6 +704,7 @@ function renderAdmin(){
       <div class="order ${o.status==='Selesai'?'selesai':''}">
         <div class="top"><b>${esc(o.nama_pemesan)}</b><span class="when">${esc(fmtWaktu(o.waktu))}</span></div>
         <div class="meta" style="color:var(--muted);font-size:.85rem">${esc(o.nama_toko)} · ${esc(o.id)}</div>
+        ${o.tanggal_preorder?`<div style="font-size:.85rem;font-weight:700;color:var(--pandan)">📅 Untuk ${esc(labelTanggal(o.tanggal_preorder))}</div>`:''}
         <div class="items">${esc(o.ringkasan)}</div>
         ${o.catatan?`<div class="note">${esc(o.catatan)}</div>`:''}
         <div class="bottom"><b>${rp(o.total)}</b>
