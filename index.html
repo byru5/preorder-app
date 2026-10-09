@@ -31,7 +31,8 @@ button{cursor:pointer}
 
 /* top bar */
 .bar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px}
-.brand{font-weight:800;font-size:1.05rem;color:var(--pandan);letter-spacing:-.01em}
+.brand{font-weight:800;font-size:1.05rem;color:var(--pandan);letter-spacing:-.01em;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bar > span:last-child{white-space:nowrap}
 .link{background:none;border:0;color:var(--pandan);font-weight:600;padding:6px 0;text-decoration:underline;text-underline-offset:3px}
 .back{background:none;border:0;font-weight:600;padding:6px 0;color:var(--pandan);display:inline-flex;gap:6px;align-items:center}
 
@@ -203,8 +204,16 @@ async function api(action, data={}){
   const body = Object.assign({ action }, data);
   if (!('kode' in body)) body.kode = store.get('po_kode') || '';
   if (!('kodeAdmin' in body)) body.kodeAdmin = sess.get('po_admin') || '';
+  if (!('kodeToko' in body)) body.kodeToko = sess.get('po_toko') || '';
   const r = await fetch(API_URL, { method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'}, body: JSON.stringify(body) });
-  const j = await r.json();
+  const txt = await r.text();
+  let j;
+  try { j = JSON.parse(txt); }
+  catch(e){
+    // Kadang Google membungkus jawaban JSON di dalam halaman HTML; ambil isinya.
+    try { const d = new DOMParser().parseFromString(txt, 'text/html'); d.querySelectorAll('script,style').forEach(x=>x.remove()); j = JSON.parse(d.body.textContent.trim()); }
+    catch(e2){ throw new Error('Server sedang sibuk. Tunggu sebentar lalu coba lagi.'); }
+  }
   if (!j.ok) throw new Error(j.error || 'Terjadi kesalahan');
   return j;
 }
@@ -216,7 +225,8 @@ function route(){
   clearInterval(refreshTimer);
   window.scrollTo(0,0);
   const h = location.hash.replace(/^#/, '') || '/';
-  if (h.startsWith('/admin')) return viewAdmin();
+  if (h.startsWith('/admin')) { if (A.owner) A.filterToko = ''; A.owner = false; return viewAdmin(); }
+  if (h.startsWith('/pemilik')) { A.owner = true; A.filterToko = ''; return viewAdmin(); }
   if (!store.get('po_kode')) return viewGate();
   if (h.startsWith('/toko/')) return viewStore(decodeURIComponent(h.slice(6)));
   return viewHome();
@@ -235,7 +245,10 @@ function viewGate(){
       <div class="err" id="e"></div>
       <button class="btn" style="width:100%;margin-top:6px" id="b">Masuk</button>
     </form>
-    <button class="link" style="margin-top:26px;align-self:center" onclick="go('/admin')">Masuk sebagai admin</button>
+    <div style="margin-top:26px;display:flex;gap:18px;justify-content:center;flex-wrap:wrap">
+      <button class="link" onclick="go('/pemilik')">Masuk sebagai pemilik toko</button>
+      <button class="link" onclick="go('/admin')">Masuk sebagai admin</button>
+    </div>
   </main>`;
   $('#kode').focus();
   $('#f').onsubmit = async e => {
@@ -401,16 +414,20 @@ function viewDone(s, res, nama){
 }
 
 /* ===== Admin ===== */
-let A = { stores:[], menus:[], orders:[], tab:'pesanan', filterToko:'' };
+let A = { stores:[], menus:[], orders:[], tab:'pesanan', filterToko:'', owner:false, ownerName:'' };
+const OWNER_ACT = { adminData:'ownerData', saveStore:'ownerSaveStore', saveMenu:'ownerSaveMenu', deleteMenu:'ownerDeleteMenu', setOrderStatus:'ownerSetOrderStatus', uploadPhoto:'ownerUploadPhoto' };
+const act = name => A.owner ? OWNER_ACT[name] : name;
+const authKey = () => A.owner ? 'po_toko' : 'po_admin';
 
 function viewAdmin(){
-  if (!sess.get('po_admin')) return viewAdminGate();
+  if (!sess.get(authKey())) return viewAdminGate();
+  const title = A.owner ? (sess.get('po_toko_nama') || 'Toko saya') : 'Admin';
   app.innerHTML = `
   <div class="wrap">
-    <div class="bar"><span class="brand">🍱 Admin</span>
+    <div class="bar"><span class="brand">🍱 ${esc(title)}</span>
       <span><button class="link" onclick="go('/')">Ke aplikasi</button> · <button class="link" onclick="adminLogout()">Keluar</button></span></div>
     <nav class="tabs" role="tablist">
-      <button data-t="pesanan">Pesanan</button><button data-t="toko">Toko</button><button data-t="menu">Menu</button>
+      <button data-t="pesanan">Pesanan</button><button data-t="toko">${A.owner?'Toko saya':'Toko'}</button><button data-t="menu">Menu</button>
     </nav>
     <div id="panel"><div class="loading">Memuat data…</div></div>
   </div>`;
@@ -418,12 +435,13 @@ function viewAdmin(){
   loadAdmin();
 }
 function viewAdminGate(){
+  const O = A.owner;
   app.innerHTML = `
   <main class="gate">
-    <h1>Admin</h1>
-    <p>Masukkan kode admin untuk mengelola toko, menu, dan pesanan.</p>
+    <h1>${O?'Pemilik toko':'Admin'}</h1>
+    <p>${O?'Masukkan kode toko dari admin untuk melihat pesanan dan mengatur menu serta jam buka toko Anda.':'Masukkan kode admin untuk mengelola toko, menu, dan pesanan.'}</p>
     <form id="f">
-      <label for="k">Kode admin</label>
+      <label for="k">${O?'Kode toko':'Kode admin'}</label>
       <input id="k" class="code-input" type="password" autocomplete="off" required>
       <div class="err" id="e"></div>
       <button class="btn" style="width:100%;margin-top:6px" id="b">Masuk</button>
@@ -434,19 +452,23 @@ function viewAdminGate(){
   $('#f').onsubmit = async e => {
     e.preventDefault(); const k = $('#k').value.trim(), b = $('#b');
     b.disabled = true; b.textContent = 'Memeriksa…'; $('#e').textContent = '';
-    try { await api('adminLogin', { kodeAdmin:k }); sess.set('po_admin', k); viewAdmin(); }
-    catch(err){ $('#e').textContent = err.message === 'Kode admin salah' ? 'Kode admin salah. Periksa lagi lalu coba ulang.' : err.message; b.disabled=false; b.textContent='Masuk'; }
+    try {
+      if (O){ const r = await api('ownerLogin', { kodeToko:k }); sess.set('po_toko', k); sess.set('po_toko_nama', r.nama); }
+      else { await api('adminLogin', { kodeAdmin:k }); sess.set('po_admin', k); }
+      A.tab = 'pesanan'; viewAdmin();
+    }
+    catch(err){ $('#e').textContent = /salah$/.test(err.message) ? err.message + '. Periksa lagi lalu coba ulang.' : err.message; b.disabled=false; b.textContent='Masuk'; }
   };
 }
-function adminLogout(){ sess.del('po_admin'); viewAdmin(); }
+function adminLogout(){ sess.del(authKey()); sess.del('po_toko_nama'); viewAdmin(); }
 
 async function loadAdmin(){
   try {
-    const d = await api('adminData');
+    const d = await api(act('adminData'));
     A.stores = d.stores; A.menus = d.menus; A.orders = d.orders;
     renderAdmin();
   } catch(err){
-    if (err.message === 'Kode admin salah') return adminLogout();
+    if (/^Kode (admin|toko) salah$/.test(err.message)) return adminLogout();
     $('#panel').innerHTML = `<div class="empty">Data gagal dimuat: ${esc(err.message)}</div>`;
   }
 }
@@ -457,12 +479,13 @@ function renderAdmin(){
   const p = $('#panel');
   if (A.tab === 'toko'){
     p.innerHTML = `
-    <div class="panel-head"><h2>Toko</h2><button class="btn small" onclick="editStore()">Tambah toko</button></div>
+    <div class="panel-head"><h2>${A.owner?'Pengaturan toko':'Toko'}</h2>${A.owner?'':'<button class="btn small" onclick="editStore()">Tambah toko</button>'}</div>
     <div class="alist">${A.stores.length ? A.stores.map(s => `
       <div class="aitem">
         <div class="th">${s.foto_url?`<img src="${esc(s.foto_url)}" alt="">`:'🏪'}</div>
         <div class="grow"><h4>${esc(s.nama)}</h4>
           <div class="meta">${esc(s.status_info)} · Mode: ${esc(s.mode||'Otomatis')}</div>
+          ${!A.owner?`<div class="meta">${s.kode_toko?'Kode toko: '+esc(s.kode_toko):'<b style="color:var(--sambal)">Belum ada kode toko</b>'}</div>`:''}
           <div class="meta">${A.menus.filter(m=>m.id_toko===s.id).length} menu${s.batas_pesan?` · Batas pesan ${esc(fmtWaktu(s.batas_pesan))}`:''}</div></div>
         <div class="acts"><button class="btn small ghost" onclick="editStore('${esc(s.id)}')">Ubah</button></div>
       </div>`).join('') : `<div class="empty">Belum ada toko. Tambahkan toko pertama untuk mulai.</div>`}</div>`;
@@ -471,7 +494,7 @@ function renderAdmin(){
     const list = A.menus.filter(m => !f || m.id_toko===f).sort((a,b)=> storeName(a.id_toko).localeCompare(storeName(b.id_toko)) || (Number(a.urutan)||0)-(Number(b.urutan)||0));
     p.innerHTML = `
     <div class="panel-head"><h2>Menu</h2><button class="btn small" onclick="editMenu()" ${A.stores.length?'':'disabled'}>Tambah menu</button></div>
-    <div class="filters"><select id="ft" aria-label="Filter toko"><option value="">Semua toko</option>${A.stores.map(s=>`<option value="${esc(s.id)}" ${f===s.id?'selected':''}>${esc(s.nama)}</option>`).join('')}</select></div>
+    <div class="filters ${A.owner?'hidden':''}"><select id="ft" aria-label="Filter toko"><option value="">Semua toko</option>${A.stores.map(s=>`<option value="${esc(s.id)}" ${f===s.id?'selected':''}>${esc(s.nama)}</option>`).join('')}</select></div>
     <div class="alist">${list.length ? list.map(m => `
       <div class="aitem">
         <div class="th">${m.foto_url?`<img src="${esc(m.foto_url)}" alt="">`:'🍽️'}</div>
@@ -486,7 +509,7 @@ function renderAdmin(){
     const totalBaru = list.filter(o=>o.status!=='Selesai').reduce((a,o)=>a+(Number(o.total)||0),0);
     p.innerHTML = `
     <div class="panel-head"><h2>Pesanan</h2><button class="btn small ghost" onclick="loadAdmin()">Muat ulang</button></div>
-    <div class="filters"><select id="ft" aria-label="Filter toko"><option value="">Semua toko</option>${A.stores.map(s=>`<option value="${esc(s.id)}" ${f===s.id?'selected':''}>${esc(s.nama)}</option>`).join('')}</select></div>
+    <div class="filters ${A.owner?'hidden':''}"><select id="ft" aria-label="Filter toko"><option value="">Semua toko</option>${A.stores.map(s=>`<option value="${esc(s.id)}" ${f===s.id?'selected':''}>${esc(s.nama)}</option>`).join('')}</select></div>
     <p class="hint" style="margin:0 0 12px">${list.filter(o=>o.status!=='Selesai').length} pesanan belum selesai, total ${rp(totalBaru)}</p>
     <div class="alist">${list.length ? list.map(o => `
       <div class="order ${o.status==='Selesai'?'selesai':''}">
@@ -504,7 +527,7 @@ function renderAdmin(){
 async function toggleOrder(id){
   const o = A.orders.find(x=>x.id===id); if (!o) return;
   const status = o.status === 'Selesai' ? 'Baru' : 'Selesai';
-  try { await api('setOrderStatus', { id, status }); o.status = status; renderAdmin(); toast(status==='Selesai'?'Pesanan ditandai selesai':'Pesanan ditandai belum selesai'); }
+  try { await api(act('setOrderStatus'), { id, status }); o.status = status; renderAdmin(); toast(status==='Selesai'?'Pesanan ditandai selesai':'Pesanan ditandai belum selesai'); }
   catch(err){ toast(err.message); }
 }
 
@@ -529,7 +552,7 @@ async function uploadFrom(input, preview, hidden){
   try {
     const data = await compressImage(file);
     preview.src = 'data:image/jpeg;base64,' + data;
-    const r = await api('uploadPhoto', { data, mimeType:'image/jpeg', name: file.name.replace(/\.[^.]+$/,'') + '.jpg' });
+    const r = await api(act('uploadPhoto'), { data, mimeType:'image/jpeg', name: file.name.replace(/\.[^.]+$/,'') + '.jpg' });
     hidden.value = r.url; preview.style.opacity = 1; toast('Foto terunggah');
   } catch(err){ preview.style.opacity = 1; toast('Foto gagal diunggah: ' + err.message); }
 }
@@ -547,7 +570,10 @@ function editStore(id){
   const d = openSheet(`
     <h2>${id?'Ubah toko':'Tambah toko'}</h2>
     <form id="sf">
-      <label for="s_nama">Nama toko</label><input id="s_nama" type="text" required value="${esc(s.nama||'')}">
+      <label for="s_nama">Nama toko</label><input id="s_nama" type="text" required value="${esc(s.nama||'')}" ${A.owner?'readonly disabled':''}>
+      ${A.owner?'<p class="hint">Nama toko hanya bisa diubah admin.</p>':`
+      <label for="s_kode">Kode toko</label><input id="s_kode" type="text" autocomplete="off" value="${esc(s.kode_toko||'')}" placeholder="Contoh: warunga88">
+      <p class="hint">Dipakai pemilik toko untuk masuk dan mengelola tokonya. Harus berbeda untuk setiap toko.</p>`}
       <label for="s_desk">Deskripsi singkat</label><input id="s_desk" type="text" value="${esc(s.deskripsi||'')}" placeholder="Contoh: Nasi campur dan aneka lauk">
       <label>Foto atau logo toko <span style="font-weight:400;color:var(--muted)">(opsional)</span></label>
       <input id="s_file" type="file" accept="image/*">
@@ -575,7 +601,7 @@ function editStore(id){
       <input id="s_ambil" type="datetime-local" value="${esc((s.waktu_ambil||'').slice(0,16))}">
       <div class="err" id="se"></div>
       <div class="actions">
-        ${id?`<button type="button" class="btn danger" id="s_del">Hapus toko</button>`:''}
+        ${id && !A.owner?`<button type="button" class="btn danger" id="s_del">Hapus toko</button>`:''}
         <button type="button" class="btn ghost" id="s_cancel">Batal</button>
         <button class="btn" id="s_save">Simpan toko</button>
       </div>
@@ -584,14 +610,15 @@ function editStore(id){
   d.querySelectorAll('.sched tr').forEach(tr => { syncRow(tr); tr.querySelector('.on').onchange = () => syncRow(tr); });
   $('#s_file', d).onchange = e => uploadFrom(e.target, $('#s_prev', d), $('#s_foto', d));
   $('#s_cancel', d).onclick = () => d.remove();
-  if (id) $('#s_del', d).onclick = async () => {
+  if (id && !A.owner) $('#s_del', d).onclick = async () => {
     if (!confirm(`Hapus toko "${s.nama}" beserta semua menunya? Riwayat pesanan tetap tersimpan.`)) return;
     try { await api('deleteStore', { id }); d.remove(); toast('Toko dihapus'); loadAdmin(); } catch(err){ $('#se', d).textContent = err.message; }
   };
   $('#sf', d).onsubmit = async e => {
     e.preventDefault();
-    const o = { id: id||'', nama: $('#s_nama',d).value.trim(), deskripsi: $('#s_desk',d).value.trim(), foto_url: $('#s_foto',d).value,
+    const o = { id: id||'', deskripsi: $('#s_desk',d).value.trim(), foto_url: $('#s_foto',d).value,
       mode: $('#s_mode',d).value, batas_pesan: $('#s_batas',d).value, waktu_ambil: $('#s_ambil',d).value };
+    if (!A.owner){ o.nama = $('#s_nama',d).value.trim(); o.kode_toko = $('#s_kode',d).value.trim(); }
     let bad = '';
     d.querySelectorAll('.sched tr').forEach(tr => {
       const h = tr.dataset.h, on = tr.querySelector('.on').checked, b = tr.querySelector('.b').value, t = tr.querySelector('.t').value;
@@ -600,7 +627,7 @@ function editStore(id){
     });
     if (bad){ $('#se',d).textContent = bad; return; }
     const btn = $('#s_save', d); btn.disabled = true; btn.textContent = 'Menyimpan…';
-    try { await api('saveStore', { store:o }); d.remove(); toast('Toko disimpan'); loadAdmin(); }
+    try { await api(act('saveStore'), { store:o }); d.remove(); toast('Toko disimpan'); loadAdmin(); }
     catch(err){ $('#se',d).textContent = err.message; btn.disabled=false; btn.textContent='Simpan toko'; }
   };
 }
@@ -610,8 +637,8 @@ function editMenu(id){
   const d = openSheet(`
     <h2>${id?'Ubah menu':'Tambah menu'}</h2>
     <form id="mf">
-      <label for="m_toko">Toko</label>
-      <select id="m_toko">${A.stores.map(s=>`<option value="${esc(s.id)}" ${m.id_toko===s.id?'selected':''}>${esc(s.nama)}</option>`).join('')}</select>
+      <label for="m_toko" class="${A.owner?'hidden':''}">Toko</label>
+      <select id="m_toko" class="${A.owner?'hidden':''}">${A.stores.map(s=>`<option value="${esc(s.id)}" ${m.id_toko===s.id?'selected':''}>${esc(s.nama)}</option>`).join('')}</select>
       <label for="m_nama">Nama menu</label><input id="m_nama" type="text" required value="${esc(m.nama||'')}">
       <label for="m_harga">Harga (Rp)</label><input id="m_harga" type="number" min="0" step="500" required value="${esc(m.harga??'')}">
       <label for="m_desk">Deskripsi</label><textarea id="m_desk" placeholder="Contoh: Nasi, ayam goreng, sambal, lalapan">${esc(m.deskripsi||'')}</textarea>
@@ -632,14 +659,14 @@ function editMenu(id){
   $('#m_cancel', d).onclick = () => d.remove();
   if (id) $('#m_del', d).onclick = async () => {
     if (!confirm(`Hapus menu "${m.nama}"?`)) return;
-    try { await api('deleteMenu', { id }); d.remove(); toast('Menu dihapus'); loadAdmin(); } catch(err){ $('#me', d).textContent = err.message; }
+    try { await api(act('deleteMenu'), { id }); d.remove(); toast('Menu dihapus'); loadAdmin(); } catch(err){ $('#me', d).textContent = err.message; }
   };
   $('#mf', d).onsubmit = async e => {
     e.preventDefault();
     const o = { id: id||'', id_toko: $('#m_toko',d).value, nama: $('#m_nama',d).value.trim(), harga: $('#m_harga',d).value,
       deskripsi: $('#m_desk',d).value.trim(), foto_url: $('#m_foto',d).value, urutan: $('#m_urut',d).value, tersedia: $('#m_ada',d).checked ? 'TRUE':'FALSE' };
     const btn = $('#m_save', d); btn.disabled = true; btn.textContent = 'Menyimpan…';
-    try { await api('saveMenu', { menu:o }); d.remove(); toast('Menu disimpan'); loadAdmin(); }
+    try { await api(act('saveMenu'), { menu:o }); d.remove(); toast('Menu disimpan'); loadAdmin(); }
     catch(err){ $('#me',d).textContent = err.message; btn.disabled=false; btn.textContent='Simpan menu'; }
   };
 }
