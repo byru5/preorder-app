@@ -96,6 +96,16 @@ input:focus,select:focus,textarea:focus{border-color:var(--pandan);outline:none}
 .menu .row{display:flex;align-items:center;justify-content:space-between;margin-top:auto;padding-top:8px}
 .price{font-weight:800;color:var(--pandan)}
 .menu.out{opacity:.55}
+.vlist{display:flex;flex-direction:column;gap:8px;margin-top:8px;padding-top:8px;border-top:1px dashed var(--line)}
+.vrow{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.vrow .vn{font-weight:600;font-size:.94rem}
+.vrow .vp{color:var(--pandan);font-weight:700;font-size:.88rem}
+.vrow.off{opacity:.5}
+.vedit{display:grid;grid-template-columns:1fr 110px auto auto;gap:8px;align-items:center;margin-top:8px}
+.vedit input[type=text],.vedit input[type=number]{padding:10px}
+.vedit .check{margin:0;font-size:.85rem}
+.vedit .x{border:0;background:none;color:var(--sambal);font-weight:700;font-size:1.2rem;padding:4px 6px}
+@media(max-width:420px){.vedit{grid-template-columns:1fr 92px}.vedit .check{grid-column:1}.vedit .x{justify-self:end}}
 .stepper{display:flex;align-items:center;gap:6px}
 .stepper button{width:36px;height:36px;border-radius:50%;border:1.5px solid var(--pandan);background:#fff;color:var(--pandan);font-weight:800;font-size:1.1rem;line-height:1}
 .stepper button.plus{background:var(--pandan);color:#fff}
@@ -376,23 +386,35 @@ function renderStore(data){
     </div>`:'<div style="height:18px"></div>'}
     ${!canOrder?`<div class="notice">Batas waktu pre-order untuk toko ini sudah lewat. Menu masih bisa dilihat, tetapi pesanan baru tidak diterima.</div>`:''}
     <section class="menus" id="menus">
-      ${menus.length ? menus.map(m => `
-        <article class="menu ${m.tersedia?'':'out'}">
+      ${menus.length ? menus.map(m => {
+        const vs = m.varian || [];
+        const avail = m.tersedia && (!vs.length || vs.some(v => !v.habis));
+        const step = (vid, label) => `
+              <span class="stepper" data-id="${esc(m.id)}" data-v="${esc(vid)}">
+                <button type="button" class="minus" aria-label="Kurangi ${esc(label)}">−</button>
+                <span aria-live="polite">0</span>
+                <button type="button" class="plus" aria-label="Tambah ${esc(label)}">+</button>
+              </span>`;
+        return `
+        <article class="menu ${avail?'':'out'}">
           <div class="ph">${m.foto_url?`<img src="${esc(thumb(m.foto_url,600))}" alt="${esc(m.nama)}" loading="lazy" decoding="async">`:'🍽️'}</div>
           <div class="body">
             <h4>${esc(m.nama)}</h4>
             ${m.deskripsi?`<div class="desc">${esc(m.deskripsi)}</div>`:''}
+            ${vs.length ? `
+            <div class="row" style="padding-top:2px"><span class="price">${vs.length>1?'mulai ':''}${rp(Math.min(...vs.map(v=>v.harga)))}</span>${!avail?'<span class="pill closed">Habis</span>':''}</div>
+            <div class="vlist">${vs.map(v => `
+              <div class="vrow ${v.habis||!m.tersedia?'off':''}">
+                <span><span class="vn">${esc(v.nama)}</span><br><span class="vp">${rp(v.harga)}</span></span>
+                ${v.habis||!m.tersedia ? '<span class="pill closed">Habis</span>' : canOrder ? step(v.id, m.nama+' '+v.nama) : ''}
+              </div>`).join('')}
+            </div>` : `
             <div class="row">
               <span class="price">${rp(m.harga)}</span>
-              ${!m.tersedia ? '<span class="pill closed">Habis</span>' : canOrder ? `
-              <span class="stepper" data-id="${esc(m.id)}">
-                <button type="button" class="minus" aria-label="Kurangi ${esc(m.nama)}">−</button>
-                <span aria-live="polite">0</span>
-                <button type="button" class="plus" aria-label="Tambah ${esc(m.nama)}">+</button>
-              </span>` : ''}
-            </div>
+              ${!m.tersedia ? '<span class="pill closed">Habis</span>' : canOrder ? step('', m.nama) : ''}
+            </div>`}
           </div>
-        </article>`).join('') : `<div class="empty">Toko ini belum punya menu.</div>`}
+        </article>`; }).join('') : `<div class="empty">Toko ini belum punya menu.</div>`}
     </section>
     ${canOrder && menus.length ? `
     <form class="order-form" id="of">
@@ -411,7 +433,8 @@ function renderStore(data){
   </div></div>` : ''}`;
 
   if (!canOrder || !menus.length) return;
-  const priceOf = Object.fromEntries(menus.map(m => [m.id, m.harga]));
+  const priceOf = {};
+  menus.forEach(m => { priceOf[m.id + '|'] = m.harga; (m.varian||[]).forEach(v => priceOf[m.id + '|' + v.id] = v.harga); });
   const update = () => {
     let n = 0, t = 0;
     for (const [k,v] of Object.entries(qty)){ n += v; t += v * priceOf[k]; }
@@ -420,14 +443,14 @@ function renderStore(data){
     $('#send').disabled = !n;
   };
   document.querySelectorAll('.stepper').forEach(st => {
-    const id = st.dataset.id, out = st.querySelector('span');
+    const id = st.dataset.id + '|' + (st.dataset.v || ''), out = st.querySelector('span');
     st.querySelector('.plus').onclick = () => { qty[id] = (qty[id]||0) + 1; out.textContent = qty[id]; update(); };
     st.querySelector('.minus').onclick = () => { qty[id] = Math.max(0,(qty[id]||0) - 1); out.textContent = qty[id]; update(); };
   });
   $('#send').onclick = async () => {
     const nama = $('#nama').value.trim();
     if (!nama){ $('#oe').textContent = 'Isi nama dulu supaya pesanan bisa dikenali.'; $('#nama').focus(); return; }
-    const items = Object.entries(qty).filter(([,v])=>v>0).map(([id,q])=>({ id, qty:q }));
+    const items = Object.entries(qty).filter(([,v])=>v>0).map(([k,q])=>{ const [id, varian_id] = k.split('|'); return { id, varian_id, qty:q }; });
     const b = $('#send'); b.disabled = true; b.textContent = 'Mengirim…'; $('#oe').textContent = '';
     try {
       const res = await api('placeOrder', { id_toko: s.id, nama, catatan: $('#cat').value.trim(), items });
@@ -553,7 +576,7 @@ function renderAdmin(){
       <div class="aitem">
         <div class="th">${m.foto_url?`<img src="${esc(thumb(m.foto_url,120))}" alt="">`:'🍽️'}</div>
         <div class="grow"><h4>${esc(m.nama)}</h4>
-          <div class="meta">${esc(storeName(m.id_toko))} · ${rp(m.harga)}${m.tersedia==='FALSE'?' · <b style="color:var(--sambal)">Habis</b>':''}</div></div>
+          <div class="meta">${esc(storeName(m.id_toko))} · ${(m.varian||[]).length?`${m.varian.length} varian, mulai ${rp(Math.min(...m.varian.map(v=>v.harga)))}`:rp(m.harga)}${m.tersedia==='FALSE'?' · <b style="color:var(--sambal)">Habis</b>':''}</div></div>
         <div class="acts"><button class="btn small ghost" onclick="editMenu('${esc(m.id)}')">Ubah</button></div>
       </div>`).join('') : `<div class="empty">${A.stores.length?'Belum ada menu. Tambahkan menu untuk toko Anda.':'Tambahkan toko dulu sebelum menambah menu.'}</div>`}</div>`;
     $('#ft').onchange = e => { A.filterToko = e.target.value; renderAdmin(); };
@@ -699,7 +722,11 @@ function editMenu(id){
       <label for="m_toko" class="${A.owner?'hidden':''}">Toko</label>
       <select id="m_toko" class="${A.owner?'hidden':''}">${A.stores.map(s=>`<option value="${esc(s.id)}" ${m.id_toko===s.id?'selected':''}>${esc(s.nama)}</option>`).join('')}</select>
       <label for="m_nama">Nama menu</label><input id="m_nama" type="text" required value="${esc(m.nama||'')}">
-      <label for="m_harga">Harga (Rp)</label><input id="m_harga" type="number" min="0" step="500" required value="${esc(m.harga??'')}">
+      <div id="m_harga_wrap"><label for="m_harga">Harga (Rp)</label><input id="m_harga" type="number" min="0" step="500" value="${esc(m.harga??'')}"></div>
+      <label>Varian <span style="font-weight:400;color:var(--muted)">(opsional, misalnya ukuran atau panas/dingin)</span></label>
+      <div id="m_vars"></div>
+      <button type="button" class="btn small ghost" id="m_addv" style="margin-top:10px">Tambah varian</button>
+      <p class="hint">Jika ada varian, setiap varian memakai harganya sendiri dan isian Harga di atas tidak dipakai.</p>
       <label for="m_desk">Deskripsi</label><textarea id="m_desk" placeholder="Contoh: Nasi, ayam goreng, sambal, lalapan">${esc(m.deskripsi||'')}</textarea>
       <label>Foto menu</label>
       <input id="m_file" type="file" accept="image/*">
@@ -716,14 +743,31 @@ function editMenu(id){
     </form>`);
   $('#m_file', d).onchange = e => uploadFrom(e.target, $('#m_prev', d), $('#m_foto', d));
   $('#m_cancel', d).onclick = () => d.remove();
+  const vbox = $('#m_vars', d);
+  const syncHarga = () => { $('#m_harga_wrap', d).style.display = vbox.children.length ? 'none' : ''; };
+  const addVar = (v={}) => {
+    const row = document.createElement('div'); row.className = 'vedit'; row.dataset.id = v.id || '';
+    row.innerHTML = `<input type="text" class="vn" placeholder="Nama varian, mis. Dingin" value="${esc(v.nama||'')}" aria-label="Nama varian">
+      <input type="number" class="vh" min="0" step="500" placeholder="Harga" value="${esc(v.harga??'')}" aria-label="Harga varian">
+      <label class="check"><input type="checkbox" class="vx" ${v.habis?'checked':''}> Habis</label>
+      <button type="button" class="x" aria-label="Hapus varian">×</button>`;
+    row.querySelector('.x').onclick = () => { row.remove(); syncHarga(); };
+    vbox.appendChild(row); syncHarga();
+    if (!v.nama) row.querySelector('.vn').focus();
+  };
+  (m.varian || []).forEach(addVar); syncHarga();
+  $('#m_addv', d).onclick = () => addVar();
   if (id) $('#m_del', d).onclick = async () => {
     if (!confirm(`Hapus menu "${m.nama}"?`)) return;
     try { await api(act('deleteMenu'), { id }); d.remove(); toast('Menu dihapus'); A.menus = A.menus.filter(x=>x.id!==id); renderAdmin(); } catch(err){ $('#me', d).textContent = err.message; }
   };
   $('#mf', d).onsubmit = async e => {
     e.preventDefault();
+    const varian = [...vbox.querySelectorAll('.vedit')].map(r => ({ id: r.dataset.id, nama: r.querySelector('.vn').value.trim(), harga: r.querySelector('.vh').value, habis: r.querySelector('.vx').checked }));
+    if (varian.some(v => !v.nama || v.harga === '')){ $('#me',d).textContent = 'Lengkapi nama dan harga setiap varian, atau hapus baris yang kosong.'; return; }
+    if (!varian.length && $('#m_harga',d).value === ''){ $('#me',d).textContent = 'Isi harga menu, atau tambahkan varian beserta harganya.'; return; }
     const o = { id: id||'', id_toko: $('#m_toko',d).value, nama: $('#m_nama',d).value.trim(), harga: $('#m_harga',d).value,
-      deskripsi: $('#m_desk',d).value.trim(), foto_url: $('#m_foto',d).value, urutan: $('#m_urut',d).value, tersedia: $('#m_ada',d).checked ? 'TRUE':'FALSE' };
+      deskripsi: $('#m_desk',d).value.trim(), foto_url: $('#m_foto',d).value, urutan: $('#m_urut',d).value, tersedia: $('#m_ada',d).checked ? 'TRUE':'FALSE', varian };
     const btn = $('#m_save', d); btn.disabled = true; btn.textContent = 'Menyimpan…';
     try {
       const r = await api(act('saveMenu'), { menu:o }); d.remove(); toast('Menu disimpan');
