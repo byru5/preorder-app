@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Pre-Order Makanan</title>
+<title>Pre-Order F&amp;B</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍱</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -254,6 +254,15 @@ async function api(action, data={}){
   return j;
 }
 function go(hash){ location.hash = hash; }
+// Tutup modal hanya jika tekanan mouse/jari dimulai DAN diakhiri di area gelap (bukan saat memblok teks)
+function backdropClose(el, fn, canClose){
+  let downOnBackdrop = false;
+  el.addEventListener('pointerdown', e => { downOnBackdrop = (e.target === el); });
+  el.addEventListener('click', e => {
+    if (e.target === el && downOnBackdrop && (!canClose || canClose())) fn();
+    downOnBackdrop = false;
+  });
+}
 
 /* ===== Cache data toko & menu (tampil instan, diperbarui di belakang) ===== */
 let ALL = null; // { stores, menus, at }
@@ -311,10 +320,11 @@ window.addEventListener('hashchange', route);
 function viewGate(){
   app.innerHTML = `
   <main class="gate">
-    <h1>Pre-order makanan</h1>
-    <p>Masukkan kode akses yang dibagikan pengelola untuk mulai memesan.</p>
+    <h1>Pre-Order F&amp;B</h1>
+    <p>Temukan pilihan kuliner dari para pengusaha BIAENERGI.</p>
     <form id="f">
       <label for="kode">Kode akses</label>
+      <p class="hint" style="margin:-2px 0 8px">Masukkan kode akses yang dibagikan pengelola untuk mulai memesan.</p>
       <input id="kode" class="code-input" type="password" inputmode="text" autocomplete="off" required>
       <div class="err" id="e"></div>
       <button class="btn" style="width:100%;margin-top:6px" id="b">Masuk</button>
@@ -516,7 +526,7 @@ function renderStore(data){
       </div></div>`;
     document.body.appendChild(box);
     const close = () => box.remove();
-    box.addEventListener('click', e => { if (e.target === box && !sending) close(); });
+    backdropClose(box, close, () => !sending);
     $('#rc-back', box).onclick = close;
     let sending = false;
     $('#rc-send', box).onclick = async () => {
@@ -544,7 +554,7 @@ function showPhoto(m){
   </div>`;
   const close = () => { box.remove(); document.removeEventListener('keydown', onKey); };
   const onKey = e => { if (e.key === 'Escape') close(); };
-  box.addEventListener('click', e => { if (e.target === box) close(); });
+  backdropClose(box, close);
   box.querySelector('.close').onclick = close;
   document.addEventListener('keydown', onKey);
   document.body.appendChild(box);
@@ -751,7 +761,7 @@ async function uploadFrom(input, preview, hidden){
 function openSheet(html){
   const d = document.createElement('div'); d.className = 'sheet';
   d.innerHTML = `<div class="box" role="dialog" aria-modal="true">${html}</div>`;
-  d.addEventListener('click', e => { if (e.target === d) d.remove(); });
+  backdropClose(d, () => d.remove());
   document.body.appendChild(d);
   return d;
 }
