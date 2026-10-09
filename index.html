@@ -219,6 +219,35 @@ async function api(action, data={}){
 }
 function go(hash){ location.hash = hash; }
 
+/* ===== Cache data toko & menu (tampil instan, diperbarui di belakang) ===== */
+let ALL = null; // { stores, menus, at }
+try { ALL = JSON.parse(localStorage.getItem('po_all') || 'null'); } catch(e){}
+let allPromise = null;
+function saveAll(){ try { localStorage.setItem('po_all', JSON.stringify(ALL)); } catch(e){} }
+function refreshAll(){
+  if (allPromise) return allPromise;
+  allPromise = api('getAll').then(d => {
+    ALL = { stores: d.stores, menus: d.menus, at: Date.now() }; saveAll(); preloadPhotos(); return ALL;
+  }).finally(() => { allPromise = null; });
+  return allPromise;
+}
+const allFresh = (ms=30000) => ALL && Date.now() - ALL.at < ms;
+function thumb(url, w){ return url ? url.replace(/sz=w\d+/, 'sz=w' + w) : url; }
+let preloaded = {};
+function preloadPhotos(){
+  const run = () => (ALL ? ALL.menus : []).forEach(m => { const u = thumb(m.foto_url, 600); if (u && !preloaded[u]) { preloaded[u] = 1; new Image().src = u; } });
+  if (window.requestIdleCallback) requestIdleCallback(run, { timeout: 2000 }); else setTimeout(run, 300);
+}
+function markOrdered(storeId){
+  if (!ALL) return;
+  const s = ALL.stores.find(x => x.id === storeId); if (!s) return;
+  s.terakhir_dipesan = '9999-12-31T23:59:59'; // sementara: paling bawah sampai data server masuk
+  ALL.stores.sort((a,b) => (a.buka!==b.buka) ? (a.buka?-1:1) : ((a.terakhir_dipesan||'') < (b.terakhir_dipesan||'') ? -1 : (a.terakhir_dipesan||'') > (b.terakhir_dipesan||'') ? 1 : a.nama.localeCompare(b.nama)));
+  saveAll();
+}
+// Bangunkan server sedini mungkin supaya permintaan pertama tidak lambat
+fetch(API_URL, { method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'}, body: JSON.stringify({ action:'ping' }) }).catch(()=>{});
+
 /* ===== Router ===== */
 let refreshTimer;
 function route(){
@@ -255,11 +284,11 @@ function viewGate(){
     e.preventDefault();
     const kode = $('#kode').value.trim(); const b = $('#b');
     b.disabled = true; b.textContent = 'Memeriksa…'; $('#e').textContent = '';
-    try { await api('login', { kode }); store.set('po_kode', kode); route(); }
+    try { await api('login', { kode }); store.set('po_kode', kode); ALL = null; route(); }
     catch(err){ $('#e').textContent = err.message === 'Kode akses salah' ? 'Kode akses salah. Periksa lagi lalu coba ulang.' : err.message; b.disabled=false; b.textContent='Masuk'; }
   };
 }
-function logout(){ store.del('po_kode'); go('/'); route(); }
+function logout(){ store.del('po_kode'); try{ localStorage.removeItem('po_all'); }catch(e){} ALL = null; go('/'); route(); }
 
 /* ===== Home ===== */
 async function viewHome(){
@@ -272,46 +301,64 @@ async function viewHome(){
     </section>
     <ol class="queue" id="list"><li class="loading">Memuat daftar toko…</li></ol>
   </div>`;
+  const render = stores => {
+    const list = $('#list'); if (!list) return;
+    if (!stores.length){ list.innerHTML = `<li class="empty">Belum ada toko. Admin bisa menambahkannya dari halaman admin.</li>`; return; }
+    let n = 0;
+    list.innerHTML = stores.map(s => {
+      const closed = !s.buka;
+      if (!closed) n++;
+      const lead = s.foto_url ? `<img src="${esc(thumb(s.foto_url,200))}" alt="">` : (closed ? '–' : n);
+      const pills = [`<span class="pill ${closed?'closed':'open'}">${esc(s.info)}</span>`];
+      if (!closed && s.lewatBatas) pills.push(`<span class="pill warn">Pre-order ditutup</span>`);
+      return `<li><button class="store ${closed?'is-closed':''} ${!closed && n===1?'is-first':''}" ${closed?'disabled aria-disabled="true"':''} data-id="${esc(s.id)}">
+        <span class="num" aria-hidden="true">${lead}</span>
+        <span>${!closed && n===1?'<span class="turn">Giliran sekarang</span>':''}
+          <h3>${esc(s.nama)}</h3>
+          ${s.deskripsi?`<div class="meta">${esc(s.deskripsi)}</div>`:''}
+          ${pills.join(' ')}
+        </span></button></li>`;
+    }).join('');
+    list.querySelectorAll('.store:not([disabled])').forEach(b => b.onclick = () => go('/toko/' + encodeURIComponent(b.dataset.id)));
+  };
+  if (ALL) render(ALL.stores);
   const load = async () => {
-    try {
-      const { stores } = await api('getStores');
-      const list = $('#list'); if (!list) return;
-      if (!stores.length){ list.innerHTML = `<li class="empty">Belum ada toko. Admin bisa menambahkannya dari halaman admin.</li>`; return; }
-      let n = 0;
-      list.innerHTML = stores.map(s => {
-        const closed = !s.buka;
-        if (!closed) n++;
-        const lead = s.foto_url ? `<img src="${esc(s.foto_url)}" alt="">` : (closed ? '–' : n);
-        const pills = [`<span class="pill ${closed?'closed':'open'}">${esc(s.info)}</span>`];
-        if (!closed && s.lewatBatas) pills.push(`<span class="pill warn">Pre-order ditutup</span>`);
-        return `<li><button class="store ${closed?'is-closed':''} ${!closed && n===1?'is-first':''}" ${closed?'disabled aria-disabled="true"':''} data-id="${esc(s.id)}">
-          <span class="num" aria-hidden="true">${lead}</span>
-          <span>${!closed && n===1?'<span class="turn">Giliran sekarang</span>':''}
-            <h3>${esc(s.nama)}</h3>
-            ${s.deskripsi?`<div class="meta">${esc(s.deskripsi)}</div>`:''}
-            ${pills.join(' ')}
-          </span></button></li>`;
-      }).join('');
-      list.querySelectorAll('.store:not([disabled])').forEach(b => b.onclick = () => go('/toko/' + encodeURIComponent(b.dataset.id)));
-    } catch(err){
+    try { await refreshAll(); render(ALL.stores); }
+    catch(err){
       if (err.message === 'Kode akses salah') return logout();
-      const list = $('#list'); if (list) list.innerHTML = `<li class="empty">Daftar toko gagal dimuat: ${esc(err.message)}. Muat ulang halaman untuk mencoba lagi.</li>`;
+      if (!ALL){ const list = $('#list'); if (list) list.innerHTML = `<li class="empty">Daftar toko gagal dimuat: ${esc(err.message)}. Muat ulang halaman untuk mencoba lagi.</li>`; }
     }
   };
-  await load();
+  if (!allFresh(5000)) load();
   refreshTimer = setInterval(load, 60000);
 }
 
 /* ===== Halaman toko ===== */
 async function viewStore(id){
-  app.innerHTML = `<div class="wrap"><button class="back" onclick="go('/')">‹ Daftar toko</button><div class="loading">Memuat menu…</div></div>`;
-  let data;
-  try { data = await api('getStore', { id }); }
-  catch(err){
-    if (err.message === 'Kode akses salah') return logout();
-    toast(err.message === 'Toko sedang tutup' ? 'Toko ini sedang tutup.' : err.message);
-    return go('/');
+  const fromCache = () => {
+    const st = ALL && ALL.stores.find(x => x.id === id);
+    return st && st.buka ? { store: st, menus: ALL.menus.filter(m => m.id_toko === id) } : null;
+  };
+  let data = fromCache();
+  if (!data){
+    app.innerHTML = `<div class="wrap"><button class="back" onclick="go('/')">‹ Daftar toko</button><div class="loading">Memuat menu…</div></div>`;
+    try { await refreshAll(); } catch(err){ if (err.message === 'Kode akses salah') return logout(); toast(err.message); return go('/'); }
+    if (!location.hash.startsWith('#/toko/' + encodeURIComponent(id))) return;
+    data = fromCache();
+    if (!data){ toast('Toko ini sedang tutup.'); return go('/'); }
+  } else if (!allFresh()) {
+    // Data dari cache: tampilkan langsung, cek ulang di belakang
+    refreshAll().then(() => {
+      if (!location.hash.startsWith('#/toko/' + encodeURIComponent(id))) return;
+      const fresh = fromCache();
+      if (!fresh){ toast('Toko ini baru saja tutup.'); return go('/'); }
+      const picked = document.querySelectorAll('.stepper span');
+      if (![...picked].some(x => x.textContent !== '0')) renderStore(fresh);
+    }).catch(()=>{});
   }
+  renderStore(data);
+}
+function renderStore(data){
   const { store: s, menus } = data;
   const qty = {};
   const canOrder = s.bisaPesan;
@@ -331,7 +378,7 @@ async function viewStore(id){
     <section class="menus" id="menus">
       ${menus.length ? menus.map(m => `
         <article class="menu ${m.tersedia?'':'out'}">
-          <div class="ph">${m.foto_url?`<img src="${esc(m.foto_url)}" alt="${esc(m.nama)}" loading="lazy">`:'🍽️'}</div>
+          <div class="ph">${m.foto_url?`<img src="${esc(thumb(m.foto_url,600))}" alt="${esc(m.nama)}" loading="lazy" decoding="async">`:'🍽️'}</div>
           <div class="body">
             <h4>${esc(m.nama)}</h4>
             ${m.deskripsi?`<div class="desc">${esc(m.deskripsi)}</div>`:''}
@@ -385,6 +432,7 @@ async function viewStore(id){
     try {
       const res = await api('placeOrder', { id_toko: s.id, nama, catatan: $('#cat').value.trim(), items });
       store.set('po_nama', nama);
+      markOrdered(s.id); refreshAll().catch(()=>{});
       viewDone(s, res, nama);
     } catch(err){
       $('#oe').textContent = err.message; b.disabled = false; b.textContent = 'Kirim pesanan';
@@ -408,7 +456,7 @@ function viewDone(s, res, nama){
         ${res.items.map(i=>`<div class="line"><span>${i.qty}× ${esc(i.nama)}</span><span>${rp(i.qty*i.harga)}</span></div>`).join('')}
         <div class="line tot"><span>Total</span><span>${rp(res.total)}</span></div>
       </div>
-      <button class="btn" onclick="go('/');route()">Kembali ke daftar toko</button>
+      <button class="btn" onclick="location.hash==='#/'?route():go('/')">Kembali ke daftar toko</button>
     </section>
   </div>`;
 }
@@ -455,21 +503,27 @@ function viewAdminGate(){
     try {
       if (O){ const r = await api('ownerLogin', { kodeToko:k }); sess.set('po_toko', k); sess.set('po_toko_nama', r.nama); }
       else { await api('adminLogin', { kodeAdmin:k }); sess.set('po_admin', k); }
-      A.tab = 'pesanan'; viewAdmin();
+      A.tab = 'pesanan'; A._loaded = false; viewAdmin();
     }
     catch(err){ $('#e').textContent = /salah$/.test(err.message) ? err.message + '. Periksa lagi lalu coba ulang.' : err.message; b.disabled=false; b.textContent='Masuk'; }
   };
 }
-function adminLogout(){ sess.del(authKey()); sess.del('po_toko_nama'); viewAdmin(); }
+function adminLogout(){ sess.del(authKey()); sess.del('po_toko_nama'); sess.del(adminCacheKey()); A._loaded = false; viewAdmin(); }
 
+const adminCacheKey = () => A.owner ? 'po_owner_data' : 'po_admin_data';
 async function loadAdmin(){
+  if (!A._loaded){
+    try { const c = JSON.parse(sess.get(adminCacheKey()) || 'null'); if (c){ A.stores = c.stores; A.menus = c.menus; A.orders = c.orders; renderAdmin(); } } catch(e){}
+  }
   try {
     const d = await api(act('adminData'));
-    A.stores = d.stores; A.menus = d.menus; A.orders = d.orders;
-    renderAdmin();
+    A.stores = d.stores; A.menus = d.menus; A.orders = d.orders; A._loaded = true;
+    sess.set(adminCacheKey(), JSON.stringify(d));
+    if (!document.querySelector('.sheet')) renderAdmin();
   } catch(err){
     if (/^Kode (admin|toko) salah$/.test(err.message)) return adminLogout();
-    $('#panel').innerHTML = `<div class="empty">Data gagal dimuat: ${esc(err.message)}</div>`;
+    if (A._loaded || A.stores.length) toast('Gagal memperbarui data: ' + err.message);
+    else $('#panel').innerHTML = `<div class="empty">Data gagal dimuat: ${esc(err.message)}</div>`;
   }
 }
 const storeName = id => (A.stores.find(s=>s.id===id)||{}).nama || '(toko dihapus)';
@@ -482,7 +536,7 @@ function renderAdmin(){
     <div class="panel-head"><h2>${A.owner?'Pengaturan toko':'Toko'}</h2>${A.owner?'':'<button class="btn small" onclick="editStore()">Tambah toko</button>'}</div>
     <div class="alist">${A.stores.length ? A.stores.map(s => `
       <div class="aitem">
-        <div class="th">${s.foto_url?`<img src="${esc(s.foto_url)}" alt="">`:'🏪'}</div>
+        <div class="th">${s.foto_url?`<img src="${esc(thumb(s.foto_url,120))}" alt="">`:'🏪'}</div>
         <div class="grow"><h4>${esc(s.nama)}</h4>
           <div class="meta">${esc(s.status_info)} · Mode: ${esc(s.mode||'Otomatis')}</div>
           ${!A.owner?`<div class="meta">${s.kode_toko?'Kode toko: '+esc(s.kode_toko):'<b style="color:var(--sambal)">Belum ada kode toko</b>'}</div>`:''}
@@ -497,7 +551,7 @@ function renderAdmin(){
     <div class="filters ${A.owner?'hidden':''}"><select id="ft" aria-label="Filter toko"><option value="">Semua toko</option>${A.stores.map(s=>`<option value="${esc(s.id)}" ${f===s.id?'selected':''}>${esc(s.nama)}</option>`).join('')}</select></div>
     <div class="alist">${list.length ? list.map(m => `
       <div class="aitem">
-        <div class="th">${m.foto_url?`<img src="${esc(m.foto_url)}" alt="">`:'🍽️'}</div>
+        <div class="th">${m.foto_url?`<img src="${esc(thumb(m.foto_url,120))}" alt="">`:'🍽️'}</div>
         <div class="grow"><h4>${esc(m.nama)}</h4>
           <div class="meta">${esc(storeName(m.id_toko))} · ${rp(m.harga)}${m.tersedia==='FALSE'?' · <b style="color:var(--sambal)">Habis</b>':''}</div></div>
         <div class="acts"><button class="btn small ghost" onclick="editMenu('${esc(m.id)}')">Ubah</button></div>
@@ -508,7 +562,7 @@ function renderAdmin(){
     const list = A.orders.filter(o => !f || o.id_toko===f);
     const totalBaru = list.filter(o=>o.status!=='Selesai').reduce((a,o)=>a+(Number(o.total)||0),0);
     p.innerHTML = `
-    <div class="panel-head"><h2>Pesanan</h2><button class="btn small ghost" onclick="loadAdmin()">Muat ulang</button></div>
+    <div class="panel-head"><h2>Pesanan</h2><button class="btn small ghost" onclick="loadAdmin().then(()=>toast('Data diperbarui'))">Muat ulang</button></div>
     <div class="filters ${A.owner?'hidden':''}"><select id="ft" aria-label="Filter toko"><option value="">Semua toko</option>${A.stores.map(s=>`<option value="${esc(s.id)}" ${f===s.id?'selected':''}>${esc(s.nama)}</option>`).join('')}</select></div>
     <p class="hint" style="margin:0 0 12px">${list.filter(o=>o.status!=='Selesai').length} pesanan belum selesai, total ${rp(totalBaru)}</p>
     <div class="alist">${list.length ? list.map(o => `
@@ -527,8 +581,9 @@ function renderAdmin(){
 async function toggleOrder(id){
   const o = A.orders.find(x=>x.id===id); if (!o) return;
   const status = o.status === 'Selesai' ? 'Baru' : 'Selesai';
-  try { await api(act('setOrderStatus'), { id, status }); o.status = status; renderAdmin(); toast(status==='Selesai'?'Pesanan ditandai selesai':'Pesanan ditandai belum selesai'); }
-  catch(err){ toast(err.message); }
+  const prev = o.status; o.status = status; renderAdmin();
+  try { await api(act('setOrderStatus'), { id, status }); }
+  catch(err){ o.status = prev; renderAdmin(); toast('Gagal menyimpan: ' + err.message); }
 }
 
 /* --- unggah foto (dikompres di browser) --- */
@@ -612,7 +667,7 @@ function editStore(id){
   $('#s_cancel', d).onclick = () => d.remove();
   if (id && !A.owner) $('#s_del', d).onclick = async () => {
     if (!confirm(`Hapus toko "${s.nama}" beserta semua menunya? Riwayat pesanan tetap tersimpan.`)) return;
-    try { await api('deleteStore', { id }); d.remove(); toast('Toko dihapus'); loadAdmin(); } catch(err){ $('#se', d).textContent = err.message; }
+    try { await api('deleteStore', { id }); d.remove(); toast('Toko dihapus'); A.stores = A.stores.filter(x=>x.id!==id); A.menus = A.menus.filter(x=>x.id_toko!==id); renderAdmin(); } catch(err){ $('#se', d).textContent = err.message; }
   };
   $('#sf', d).onsubmit = async e => {
     e.preventDefault();
@@ -627,7 +682,11 @@ function editStore(id){
     });
     if (bad){ $('#se',d).textContent = bad; return; }
     const btn = $('#s_save', d); btn.disabled = true; btn.textContent = 'Menyimpan…';
-    try { await api(act('saveStore'), { store:o }); d.remove(); toast('Toko disimpan'); loadAdmin(); }
+    try {
+      const r = await api(act('saveStore'), { store:o }); d.remove(); toast('Toko disimpan');
+      if (r.store){ const i = A.stores.findIndex(x=>x.id===r.id); if (i>=0) A.stores[i] = r.store; else A.stores.push(r.store); renderAdmin(); }
+      else loadAdmin();
+    }
     catch(err){ $('#se',d).textContent = err.message; btn.disabled=false; btn.textContent='Simpan toko'; }
   };
 }
@@ -659,14 +718,18 @@ function editMenu(id){
   $('#m_cancel', d).onclick = () => d.remove();
   if (id) $('#m_del', d).onclick = async () => {
     if (!confirm(`Hapus menu "${m.nama}"?`)) return;
-    try { await api(act('deleteMenu'), { id }); d.remove(); toast('Menu dihapus'); loadAdmin(); } catch(err){ $('#me', d).textContent = err.message; }
+    try { await api(act('deleteMenu'), { id }); d.remove(); toast('Menu dihapus'); A.menus = A.menus.filter(x=>x.id!==id); renderAdmin(); } catch(err){ $('#me', d).textContent = err.message; }
   };
   $('#mf', d).onsubmit = async e => {
     e.preventDefault();
     const o = { id: id||'', id_toko: $('#m_toko',d).value, nama: $('#m_nama',d).value.trim(), harga: $('#m_harga',d).value,
       deskripsi: $('#m_desk',d).value.trim(), foto_url: $('#m_foto',d).value, urutan: $('#m_urut',d).value, tersedia: $('#m_ada',d).checked ? 'TRUE':'FALSE' };
     const btn = $('#m_save', d); btn.disabled = true; btn.textContent = 'Menyimpan…';
-    try { await api(act('saveMenu'), { menu:o }); d.remove(); toast('Menu disimpan'); loadAdmin(); }
+    try {
+      const r = await api(act('saveMenu'), { menu:o }); d.remove(); toast('Menu disimpan');
+      if (r.menu){ const i = A.menus.findIndex(x=>x.id===r.id); if (i>=0) A.menus[i] = r.menu; else A.menus.push(r.menu); renderAdmin(); }
+      else loadAdmin();
+    }
     catch(err){ $('#me',d).textContent = err.message; btn.disabled=false; btn.textContent='Simpan menu'; }
   };
 }
