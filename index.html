@@ -241,7 +241,7 @@ const API_URL = 'https://script.google.com/macros/s/AKfycbxWXi3LDOOT-x1nIlx1usib
 const HARI = ['senin','selasa','rabu','kamis','jumat','sabtu','minggu'];
 const NAMA_HARI = ['Senin','Selasa','Rabu','Kamis','Jumat','Sabtu','Minggu'];
 // Nomor versi aplikasi: NAIKKAN setiap commit baru, supaya link di WhatsApp selalu memuat versi terbaru
-const APP_VERSION = 11;
+const APP_VERSION = 12;
 const SITE_URL = 'https://byru5.github.io/preorder-app/';
 const shareUrl = () => (window.DEMO_API ? SITE_URL : location.origin + location.pathname) + '?v=' + APP_VERSION + '#/';
 
@@ -949,10 +949,9 @@ function editStore(id){
   const d = openSheet(`
     <h2>${id?'Ubah toko':'Tambah toko'}</h2>
     <form id="sf">
-      <label for="s_nama">Nama toko</label><input id="s_nama" type="text" required value="${esc(s.nama||'')}" ${A.owner?'readonly disabled':''}>
-      ${A.owner?'<p class="hint">Nama toko hanya bisa diubah admin.</p>':`
-      <label for="s_kode">Kode toko</label>${pwField(`<input id="s_kode" type="password" autocomplete="new-password" value="${esc(s.kode_toko||'')}" placeholder="Contoh: warunga88">`)}
-      <p class="hint">Dipakai pemilik toko untuk masuk dan mengelola tokonya. Harus berbeda untuk setiap toko.</p>`}
+      <label for="s_nama">Nama toko</label><input id="s_nama" type="text" required value="${esc(s.nama||'')}">
+      <label for="s_kode">Kode toko</label>${pwField(`<input id="s_kode" type="password" autocomplete="new-password" value="${esc(A.owner ? (sess.get('po_toko')||'') : (s.kode_toko||''))}" placeholder="Contoh: warunga88">`)}
+      <p class="hint">${A.owner ? 'Kode untuk masuk ke halaman pemilik toko ini. Minimal 4 karakter dan harus berbeda dari toko lain. Setelah diganti, gunakan kode baru saat masuk berikutnya.' : 'Dipakai pemilik toko untuk masuk dan mengelola tokonya. Harus berbeda untuk setiap toko.'}</p>
       <label for="s_desk">Deskripsi singkat</label><input id="s_desk" type="text" value="${esc(s.deskripsi||'')}" placeholder="Contoh: Nasi campur dan aneka lauk">
       <label>Foto atau logo toko <span style="font-weight:400;color:var(--muted)">(opsional)</span></label>
       <div class="filepick"><input id="s_file" type="file" accept="image/*"><label for="s_file">📷 Pilih foto</label><span class="fn">${s.foto_url?'Foto sudah ada':'Belum ada foto'}</span></div>
@@ -1031,7 +1030,9 @@ function editStore(id){
     const o = { id: id||'', deskripsi: $('#s_desk',d).value.trim(), foto_url: $('#s_foto',d).value,
       mode: $('#s_mode',d).value, waktu_ambil: $('#s_ambil',d).value };
     o.batas_pesan = ''; // batas pesan kini menyatu dengan jadwal terima pesanan
-    if (!A.owner){ o.nama = $('#s_nama',d).value.trim(); o.kode_toko = $('#s_kode',d).value.trim(); }
+    o.nama = $('#s_nama',d).value.trim(); o.kode_toko = $('#s_kode',d).value.trim();
+    if (!o.nama){ $('#se',d).textContent = 'Nama toko wajib diisi.'; return; }
+    if (A.owner && o.kode_toko.length < 4){ $('#se',d).textContent = 'Kode toko minimal 4 karakter.'; return; }
     let bad = '';
     o.po_mode = poMode;
     if (poMode === 'custom'){
@@ -1051,7 +1052,13 @@ function editStore(id){
     if (bad){ $('#se',d).textContent = bad; return; }
     const btn = $('#s_save', d); btn.disabled = true; btn.textContent = 'Menyimpan…';
     try {
-      const r = await api(act('saveStore'), { store:o }); d.remove(); toast('Toko disimpan');
+      const r = await api(act('saveStore'), { store:o }); d.remove();
+      if (A.owner){
+        const kodeBaru = o.kode_toko !== sess.get('po_toko');
+        sess.set('po_toko', o.kode_toko); sess.set('po_toko_nama', o.nama);
+        const br = document.querySelector('.bar .brand'); if (br) br.textContent = '🍱 ' + o.nama;
+        toast(kodeBaru ? 'Toko disimpan. Kode toko baru sudah aktif.' : 'Toko disimpan');
+      } else toast('Toko disimpan');
       if (r.store){ const i = A.stores.findIndex(x=>x.id===r.id); if (i>=0) A.stores[i] = r.store; else A.stores.push(r.store); renderAdmin(); }
       else loadAdmin();
     }
