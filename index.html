@@ -44,7 +44,7 @@ button{cursor:pointer}
 .btn.danger{background:transparent;color:var(--sambal);box-shadow:inset 0 0 0 2px var(--sambal)}
 .btn.small{padding:8px 14px;font-size:.9rem}
 label{display:block;font-weight:600;font-size:.92rem;margin:14px 0 6px}
-input[type=text],input[type=password],input[type=number],input[type=time],input[type=datetime-local],select,textarea{
+input[type=text],input[type=password],input[type=number],input[type=time],input[type=datetime-local],input[type=date],select,textarea{
   width:100%;padding:12px 14px;border:1.5px solid var(--line);border-radius:var(--r-sm);background:#fff}
 textarea{min-height:80px;resize:vertical}
 input:focus,select:focus,textarea:focus{border-color:var(--pandan);outline:none}
@@ -56,6 +56,12 @@ input:focus,select:focus,textarea:focus{border-color:var(--pandan);outline:none}
 .gate h1{font-size:2.4rem;line-height:1.05;letter-spacing:-.03em;margin:0 0 10px;color:var(--pandan)}
 .gate p{color:var(--muted);margin:0 0 22px}
 .code-input{font-size:1.6rem!important;letter-spacing:.3em;text-align:center;font-weight:700}
+.pw{position:relative}
+.pw input{padding-right:52px!important}
+.pw .code-input{padding-left:52px!important}
+.pw .eye{position:absolute;top:50%;right:6px;transform:translateY(-50%);width:42px;height:42px;border:0;background:none;color:var(--muted);display:flex;align-items:center;justify-content:center;border-radius:50%;padding:0}
+.pw .eye:hover{color:var(--pandan);background:var(--leaf)}
+.pw .eye svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;pointer-events:none}
 
 /* home */
 .hello h1{font-size:1.9rem;line-height:1.1;letter-spacing:-.025em;margin:0 0 6px}
@@ -117,7 +123,8 @@ input:focus,select:focus,textarea:focus{border-color:var(--pandan);outline:none}
 .vedit .x{border:0;background:none;color:var(--sambal);font-weight:700;font-size:1.2rem;padding:4px 6px}
 @media(max-width:420px){.vedit{grid-template-columns:1fr 92px}.vedit .check{grid-column:1}.vedit .x{justify-self:end}}
 .stepper{display:flex;align-items:center;gap:6px}
-.stepper button{width:36px;height:36px;border-radius:50%;border:1.5px solid var(--pandan);background:#fff;color:var(--pandan);font-weight:800;font-size:1.1rem;line-height:1}
+.stepper button{width:36px;height:36px;border-radius:50%;border:1.5px solid var(--pandan);background:#fff;color:var(--pandan);padding:0;display:inline-flex;align-items:center;justify-content:center;flex:none;-webkit-tap-highlight-color:transparent}
+.stepper button svg{width:14px;height:14px;display:block;stroke:currentColor;stroke-width:2.6;stroke-linecap:round;fill:none;pointer-events:none}
 .stepper button.plus{background:var(--pandan);color:#fff}
 .stepper span{min-width:22px;text-align:center;font-weight:700}
 .order-form{margin-top:26px;background:var(--card);border:1.5px solid var(--line);border-radius:var(--r-lg);padding:6px 16px 18px}
@@ -153,7 +160,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--pandan);outline:none}
 
 /* admin */
 .tabs{display:flex;gap:6px;background:var(--leaf);padding:5px;border-radius:999px;margin-bottom:18px}
-.tabs button{flex:1;border:0;background:transparent;padding:9px 6px;border-radius:999px;font-weight:700;color:var(--pandan)}
+.tabs button{flex:1;border:0;background:transparent;padding:9px 4px;font-size:.92rem;white-space:nowrap;border-radius:999px;font-weight:700;color:var(--pandan)}
 .tabs button.on{background:#fff;box-shadow:0 1px 2px rgba(31,81,54,.15)}
 .panel-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px}
 .panel-head h2{margin:0;font-size:1.25rem}
@@ -177,6 +184,25 @@ input:focus,select:focus,textarea:focus{border-color:var(--pandan);outline:none}
 .sched .off{color:var(--muted);font-size:.85rem}
 .check{display:flex;gap:8px;align-items:center;font-weight:600;margin:14px 0 0}
 .check input{width:20px;height:20px;accent-color:var(--pandan)}
+.mode-chips{display:flex;gap:8px;flex-wrap:wrap}
+.mode-chips .chip{border:1.5px solid var(--line);background:#fff;border-radius:12px;padding:8px 12px;font-size:.88rem;font-weight:700;color:var(--muted);text-align:left;line-height:1.25}
+.mode-chips .chip small{display:block;font-weight:500;font-size:.76rem}
+.mode-chips .chip.on{background:var(--pandan);border-color:var(--pandan);color:#fff}
+.daychips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.daychips label{margin:0;display:inline-flex}
+.daychips input{position:absolute;opacity:0;pointer-events:none}
+.daychips span{display:inline-block;min-width:42px;text-align:center;padding:7px 6px;border-radius:999px;border:1.5px solid var(--line);background:#fff;font-weight:700;font-size:.85rem;color:var(--muted);cursor:pointer}
+.daychips input:checked + span{background:var(--pandan);border-color:var(--pandan);color:#fff}
+.daychips input:focus-visible + span{outline:3px solid var(--kunyit);outline-offset:2px}
+.batas-row{display:flex;gap:8px;align-items:center}
+.batas-row input[type=time],.batas-row input[type=datetime-local]{flex:1;min-width:0}
+.filepick{display:flex;align-items:center;gap:10px;max-width:100%;min-width:0}
+.filepick input[type=file]{position:absolute;width:1px;height:1px;opacity:0;overflow:hidden;clip:rect(0 0 0 0)}
+.filepick label{margin:0;flex:none;display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:9px 16px;font-weight:700;font-size:.9rem;color:var(--pandan);box-shadow:inset 0 0 0 2px var(--pandan);background:#fff;cursor:pointer}
+.filepick input[type=file]:focus-visible + label{outline:3px solid var(--kunyit);outline-offset:2px}
+.filepick .fn{min-width:0;flex:1;color:var(--muted);font-size:.85rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sheet .box{overflow-x:hidden}
+.sheet .box form{min-width:0;max-width:100%}
 .foto-prev{width:100%;max-width:220px;aspect-ratio:4/3;object-fit:cover;border-radius:var(--r-sm);margin-top:8px;background:var(--leaf)}
 .actions{display:flex;gap:10px;justify-content:flex-end;margin-top:20px;flex-wrap:wrap}
 .order{background:var(--card);border:1.5px solid var(--line);border-radius:var(--r-sm);padding:12px 14px}
@@ -189,6 +215,12 @@ input:focus,select:focus,textarea:focus{border-color:var(--pandan);outline:none}
 .order .bottom{display:flex;justify-content:space-between;align-items:center;gap:8px}
 .filters{display:flex;gap:8px;margin-bottom:12px}
 .filters select{flex:1}
+.filters input[type=date]{flex:1;min-width:0;padding:10px 12px}
+.quick{display:flex;gap:6px;flex-wrap:wrap;margin:-4px 0 12px}
+.quick button{border:1.5px solid var(--line);background:#fff;border-radius:999px;padding:5px 12px;font-size:.84rem;font-weight:700;color:var(--pandan)}
+.quick button.on{background:var(--leaf);border-color:var(--pandan)}
+.panel-head .btns{display:flex;gap:6px}
+.rekap-text{background:#fff;border:1.5px solid var(--line);border-radius:var(--r-sm);padding:12px 14px;white-space:pre-wrap;font-family:inherit;font-size:.92rem;line-height:1.55;max-height:50vh;overflow:auto;margin:10px 0 0}
 .toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);
   background:var(--ink);color:#fff;padding:10px 18px;border-radius:999px;font-weight:600;z-index:20;max-width:90vw}
 .loading{color:var(--muted);padding:30px 0;text-align:center}
@@ -209,8 +241,9 @@ const API_URL = 'https://script.google.com/macros/s/AKfycbxWXi3LDOOT-x1nIlx1usib
 const HARI = ['senin','selasa','rabu','kamis','jumat','sabtu','minggu'];
 const NAMA_HARI = ['Senin','Selasa','Rabu','Kamis','Jumat','Sabtu','Minggu'];
 // Nomor versi aplikasi: NAIKKAN setiap commit baru, supaya link di WhatsApp selalu memuat versi terbaru
-const APP_VERSION = 10;
-const shareUrl = () => location.origin + location.pathname + '?v=' + APP_VERSION + '#/';
+const APP_VERSION = 11;
+const SITE_URL = 'https://byru5.github.io/preorder-app/';
+const shareUrl = () => (window.DEMO_API ? SITE_URL : location.origin + location.pathname) + '?v=' + APP_VERSION + '#/';
 
 /* ===== Util ===== */
 const $ = (s, el=document) => el.querySelector(s);
@@ -244,6 +277,7 @@ async function api(action, data={}){
   if (!('kode' in body)) body.kode = store.get('po_kode') || '';
   if (!('kodeAdmin' in body)) body.kodeAdmin = sess.get('po_admin') || '';
   if (!('kodeToko' in body)) body.kodeToko = sess.get('po_toko') || '';
+  if (window.DEMO_API) { const d = await window.DEMO_API(body); if (!d.ok) throw new Error(d.error || 'Terjadi kesalahan'); return d; } // hanya di mode preview
   const r = await fetch(API_URL, { method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'}, body: JSON.stringify(body) });
   const txt = await r.text();
   let j;
@@ -257,6 +291,18 @@ async function api(action, data={}){
   return j;
 }
 function go(hash){ location.hash = hash; }
+// Tombol tampilkan/sembunyikan untuk isian kode
+const EYE_ON = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>';
+const EYE_OFF = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3l18 18"/><path d="M10.6 5.1A10.6 10.6 0 0 1 12 5c6.4 0 10 7 10 7a17.7 17.7 0 0 1-3.2 4.2M6.6 6.6C3.9 8.4 2 12 2 12s3.6 7 10 7a9.7 9.7 0 0 0 5.4-1.6"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg>';
+const pwField = inputHtml => `<div class="pw">${inputHtml}<button type="button" class="eye" aria-label="Tampilkan kode" aria-pressed="false">${EYE_ON}</button></div>`;
+function bindPw(root){
+  root.querySelectorAll('.pw .eye').forEach(b => b.onclick = () => {
+    const i = b.parentElement.querySelector('input'); const show = i.type === 'password';
+    i.type = show ? 'text' : 'password';
+    b.innerHTML = show ? EYE_OFF : EYE_ON; b.setAttribute('aria-pressed', show); b.setAttribute('aria-label', show ? 'Sembunyikan kode' : 'Tampilkan kode');
+    i.focus();
+  });
+}
 // Tutup modal hanya jika tekanan mouse/jari dimulai DAN diakhiri di area gelap (bukan saat memblok teks)
 function backdropClose(el, fn, canClose){
   let downOnBackdrop = false;
@@ -282,7 +328,26 @@ function refreshAll(){
 const allFresh = (ms=30000) => ALL && Date.now() - ALL.at < ms;
 const BLN = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
 const HARI_ID = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
+function labelPendek(iso){ if (!iso) return ''; const [y,m,d] = iso.split('-').map(Number); return HARI_ID[new Date(y, m-1, d).getDay()].slice(0,3) + ', ' + d + ' ' + BLN[m-1]; }
+const poOf = s => (s && s.po) || { iso: '', label: preorderLabel(), custom: false };
 function labelTanggal(iso){ if (!iso) return ''; const [y,m,d] = iso.split('-').map(Number); const dt = new Date(y, m-1, d); return HARI_ID[dt.getDay()] + ', ' + d + ' ' + BLN[m-1]; }
+// Batas pesan berulang: "HH:MM|0,1,2" (0 = Senin ... 6 = Minggu). Format lama (tanggal-jam) tetap didukung.
+const INISIAL = ['Sen','Sel','Rab','Kam','Jum','Sab','Min'];
+function parseBatas(v){
+  if (!v) return null;
+  const m = String(v).match(/^(\d{2}:\d{2})\|([\d,]*)$/);
+  if (m) return { jam: m[1], hari: m[2] ? m[2].split(',').map(Number) : [] };
+  return { legacy: String(v) };
+}
+function hariIniWIB(){ const d = new Intl.DateTimeFormat('en-GB', { timeZone:'Asia/Jakarta', weekday:'short' }).format(new Date()); return ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].indexOf(d); }
+function batasLabel(v, untukHariIni){
+  const b = parseBatas(v); if (!b) return '';
+  if (b.legacy) return fmtWaktu(b.legacy);
+  const jam = b.jam.replace(':', '.');
+  if (untukHariIni) return b.hari.includes(hariIniWIB()) ? `Hari ini pukul ${jam}` : '';
+  const hari = b.hari.length === 7 ? 'setiap hari' : b.hari.map(i => INISIAL[i]).join(', ');
+  return `${jam} · ${hari}`;
+}
 // Tanggal pre-order = hari kerja berikutnya (Jumat/Sabtu/Minggu -> Senin). Utamakan data server.
 function preorderLabel(){
   if (ALL && ALL.po && ALL.po.label) return ALL.po.label;
@@ -303,7 +368,7 @@ function markOrdered(storeId){
   saveAll();
 }
 // Bangunkan server sedini mungkin supaya permintaan pertama tidak lambat
-fetch(API_URL, { method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'}, body: JSON.stringify({ action:'ping' }) }).catch(()=>{});
+if (!window.DEMO_API) fetch(API_URL, { method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'}, body: JSON.stringify({ action:'ping' }) }).catch(()=>{});
 
 /* ===== Router ===== */
 let refreshTimer;
@@ -328,7 +393,7 @@ function viewGate(){
     <form id="f">
       <label for="kode">Kode akses</label>
       <p class="hint" style="margin:-2px 0 8px">Masukkan kode akses yang dibagikan pengelola untuk mulai memesan.</p>
-      <input id="kode" class="code-input" type="password" inputmode="text" autocomplete="off" required>
+      ${pwField('<input id="kode" class="code-input" type="password" inputmode="text" autocomplete="off" required>')}
       <div class="err" id="e"></div>
       <button class="btn" style="width:100%;margin-top:6px" id="b">Masuk</button>
     </form>
@@ -337,7 +402,7 @@ function viewGate(){
       <button class="link" onclick="go('/admin')">Masuk sebagai admin</button>
     </div>
   </main>`;
-  $('#kode').focus();
+  bindPw(app); $('#kode').focus();
   $('#f').onsubmit = async e => {
     e.preventDefault();
     const kode = $('#kode').value.trim(); const b = $('#b');
@@ -368,7 +433,7 @@ async function viewHome(){
       if (!closed) n++;
       const lead = s.foto_url ? `<img src="${esc(thumb(s.foto_url,200))}" alt="">` : (closed ? '–' : n);
       const pills = [`<span class="pill ${closed?'closed':'open'}">${esc(s.info)}</span>`];
-      if (!closed && s.lewatBatas) pills.push(`<span class="pill warn">Pre-order ditutup</span>`);
+      if (!closed && s.po && s.po.iso) pills.push(`<span class="pill warn">📅 PO ${esc(labelPendek(s.po.iso))}</span>`);
       return `<li><button class="store ${closed?'is-closed':''} ${!closed && n===1?'is-first':''}" ${closed?'disabled aria-disabled="true"':''} data-id="${esc(s.id)}">
         <span class="num" aria-hidden="true">${lead}</span>
         <span>${!closed && n===1?'<span class="turn">Giliran sekarang</span>':''}
@@ -403,13 +468,13 @@ async function viewStore(id){
     try { await refreshAll(); } catch(err){ if (err.message === 'Kode akses salah') return logout(); toast(err.message); return go('/'); }
     if (!location.hash.startsWith('#/toko/' + encodeURIComponent(id))) return;
     data = fromCache();
-    if (!data){ toast('Toko ini sedang tutup.'); return go('/'); }
+    if (!data){ toast('Toko ini sedang tidak menerima pesanan.'); return go('/'); }
   } else if (!allFresh()) {
     // Data dari cache: tampilkan langsung, cek ulang di belakang
     refreshAll().then(() => {
       if (!location.hash.startsWith('#/toko/' + encodeURIComponent(id))) return;
       const fresh = fromCache();
-      if (!fresh){ toast('Toko ini baru saja tutup.'); return go('/'); }
+      if (!fresh){ toast('Pesanan untuk toko ini baru saja ditutup.'); return go('/'); }
       const picked = document.querySelectorAll('.stepper span');
       if (![...picked].some(x => x.textContent !== '0')) renderStore(fresh);
     }).catch(()=>{});
@@ -428,9 +493,9 @@ function renderStore(data){
       ${s.deskripsi?`<p>${esc(s.deskripsi)}</p>`:''}
       <span class="pill open">${esc(s.info)}</span>
     </header>
-    <div class="po-day">📅 <span>Pre-order untuk <b>${esc(preorderLabel())}</b></span></div>
-    ${(s.batas_pesan||s.waktu_ambil)?`<div class="po">
-      <div><small>Pesan paling lambat</small><b>${s.batas_pesan?esc(fmtWaktu(s.batas_pesan)):'Tidak dibatasi'}</b></div>
+    <div class="po-day">📅 <span>Pre-order untuk <b>${esc(poOf(s).label)}</b></span></div>
+    ${(s.batas_label||s.waktu_ambil)?`<div class="po">
+      <div><small>Pesan paling lambat</small><b>${s.batas_label?esc(s.batas_label):'Tidak dibatasi'}</b></div>
       <div><small>Waktu pengambilan</small><b>${s.waktu_ambil?esc(fmtWaktu(s.waktu_ambil)):'Menyusul'}</b></div>
     </div>`:'<div style="height:18px"></div>'}
     ${!canOrder?`<div class="notice">Batas waktu pre-order untuk toko ini sudah lewat. Menu masih bisa dilihat, tetapi pesanan baru tidak diterima.</div>`:''}
@@ -440,9 +505,9 @@ function renderStore(data){
         const avail = m.tersedia && (!vs.length || vs.some(v => !v.habis));
         const step = (vid, label) => `
               <span class="stepper" data-id="${esc(m.id)}" data-v="${esc(vid)}">
-                <button type="button" class="minus" aria-label="Kurangi ${esc(label)}">−</button>
+                <button type="button" class="minus" aria-label="Kurangi ${esc(label)}"><svg viewBox="0 0 14 14" aria-hidden="true"><path d="M2 7h10"/></svg></button>
                 <span aria-live="polite">0</span>
-                <button type="button" class="plus" aria-label="Tambah ${esc(label)}">+</button>
+                <button type="button" class="plus" aria-label="Tambah ${esc(label)}"><svg viewBox="0 0 14 14" aria-hidden="true"><path d="M2 7h10M7 2v10"/></svg></button>
               </span>`;
         return `
         <article class="menu ${avail?'':'out'}">
@@ -512,7 +577,7 @@ function renderStore(data){
     const box = document.createElement('div'); box.className = 'recap';
     box.innerHTML = `<div class="box" role="dialog" aria-modal="true" aria-labelledby="rc-t">
       <h2 id="rc-t">Rekap pesanan</h2>
-      <p class="sub">${esc(s.nama)} · Pre-order untuk ${esc(preorderLabel())}</p>
+      <p class="sub">${esc(s.nama)} · Pre-order untuk ${esc(poOf(s).label)}</p>
       <div class="card">
         ${lines.map(l => `<div class="line"><span>${l.qty}× ${esc(l.nama)}</span><span>${rp(l.qty*l.harga)}</span></div>`).join('')}
         <div class="line tot"><span>Total</span><span>${rp(total)}</span></div>
@@ -564,14 +629,15 @@ function showPhoto(m){
   box.querySelector('.close').focus();
 }
 
-function waMessage(storeName, nama){
+function waMessage(storeName, nama, po){
   const open = (ALL ? ALL.stores : []).filter(x => x.buka);
   const url = shareUrl();
-  const parts = [`🍱 Pre-Order Besok (${preorderLabel()})`, `${nama} sudah pesan di ${storeName} ✅`, '', 'Toko yang buka hari ini :'];
+  po = po || { label: preorderLabel(), custom: false };
+  const parts = [`🍱 Pre-Order ${po.custom ? '' : 'Besok '}(${po.label})`, `${nama} sudah pesan di ${storeName} ✅`, '', 'Toko yang menerima pesanan hari ini:'];
   open.forEach((t, i) => {
     parts.push(`${i+1}. *${t.nama}*`);
     if (t.deskripsi) parts.push(`_${t.deskripsi}_`);
-    if (t.tutup) parts.push(`buka s/d ${t.tutup.replace(':', '.')}`);
+    if (t.tutup_label) parts.push(`pesan s/d ${t.tutup_label}`);
     parts.push('');
   });
   parts.push(`Yuk ikut pesan 👉 ${url}`);
@@ -580,7 +646,7 @@ function waMessage(storeName, nama){
 
 function viewDone(s, res, nama){
   window.scrollTo(0,0);
-  const po = (res.preorder && res.preorder.label) || preorderLabel();
+  const poObj = res.preorder || poOf(s); const po = poObj.label;
   app.innerHTML = `
   <div class="wrap">
     <section class="done">
@@ -601,7 +667,7 @@ function viewDone(s, res, nama){
       <button class="link" onclick="location.hash==='#/'?route():go('/')">Kembali ke daftar toko</button>
     </section>
   </div>`;
-  const msg = () => waMessage(s.nama, nama);
+  const msg = () => waMessage(s.nama, nama, poObj);
   $('#wa').onclick = () => { window.open('https://wa.me/?text=' + encodeURIComponent(msg()), '_blank'); };
   $('#copy').onclick = async () => {
     try { await navigator.clipboard.writeText(msg()); toast('Pesan disalin. Tempel di grup WhatsApp.'); }
@@ -610,7 +676,10 @@ function viewDone(s, res, nama){
 }
 
 /* ===== Admin ===== */
-let A = { stores:[], menus:[], orders:[], tab:'pesanan', filterToko:'', owner:false, ownerName:'' };
+let A = { stores:[], menus:[], orders:[], tab:'pesanan', filterToko:'', filterTanggal:'', owner:false, ownerName:'' };
+const todayWIB = () => new Intl.DateTimeFormat('en-CA', { timeZone:'Asia/Jakarta', year:'numeric', month:'2-digit', day:'2-digit' }).format(new Date());
+function nextPreorderISO(){ const [y,m,d] = todayWIB().split('-').map(Number); const t = new Date(Date.UTC(y, m-1, d)); const dow = t.getUTCDay(); t.setUTCDate(t.getUTCDate() + (dow===5?3:dow===6?2:1)); return t.toISOString().slice(0,10); }
+const orderDate = o => o.tanggal_preorder || String(o.waktu||'').slice(0,10);
 const OWNER_ACT = { adminData:'ownerData', saveStore:'ownerSaveStore', saveMenu:'ownerSaveMenu', deleteMenu:'ownerDeleteMenu', setOrderStatus:'ownerSetOrderStatus', uploadPhoto:'ownerUploadPhoto' };
 const act = name => A.owner ? OWNER_ACT[name] : name;
 const authKey = () => A.owner ? 'po_toko' : 'po_admin';
@@ -623,7 +692,7 @@ function viewAdmin(){
     <div class="bar"><span class="brand">🍱 ${esc(title)}</span>
       <span><button class="link" onclick="go('/')">Ke aplikasi</button> · <button class="link" onclick="adminLogout()">Keluar</button></span></div>
     <nav class="tabs" role="tablist">
-      <button data-t="pesanan">Pesanan</button><button data-t="toko">${A.owner?'Toko saya':'Toko'}</button><button data-t="menu">Menu</button>
+      <button data-t="pesanan">Pesanan</button><button data-t="toko">Toko</button><button data-t="menu">Menu</button>${A.owner?'<button data-t="promosi">Promosi</button>':''}
     </nav>
     <div id="panel"><div class="loading">Memuat data…</div></div>
   </div>`;
@@ -638,13 +707,13 @@ function viewAdminGate(){
     <p>${O?'Masukkan kode toko dari admin untuk melihat pesanan dan mengatur menu serta jam buka toko Anda.':'Masukkan kode admin untuk mengelola toko, menu, dan pesanan.'}</p>
     <form id="f">
       <label for="k">${O?'Kode toko':'Kode admin'}</label>
-      <input id="k" class="code-input" type="password" autocomplete="off" required>
+      ${pwField('<input id="k" class="code-input" type="password" autocomplete="off" required>')}
       <div class="err" id="e"></div>
       <button class="btn" style="width:100%;margin-top:6px" id="b">Masuk</button>
     </form>
     <button class="link" style="margin-top:26px;align-self:center" onclick="go('/')">Kembali ke aplikasi</button>
   </main>`;
-  $('#k').focus();
+  bindPw(app); $('#k').focus();
   $('#f').onsubmit = async e => {
     e.preventDefault(); const k = $('#k').value.trim(), b = $('#b');
     b.disabled = true; b.textContent = 'Memeriksa…'; $('#e').textContent = '';
@@ -679,6 +748,7 @@ const storeName = id => (A.stores.find(s=>s.id===id)||{}).nama || '(toko dihapus
 function renderAdmin(){
   document.querySelectorAll('.tabs button').forEach(b => { b.classList.toggle('on', b.dataset.t===A.tab); b.setAttribute('aria-selected', b.dataset.t===A.tab); });
   const p = $('#panel');
+  if (A.tab === 'promosi' && A.owner) return renderPromo(p);
   if (A.tab === 'toko'){
     p.innerHTML = `
     <div class="panel-head"><h2>${A.owner?'Pengaturan toko':'Toko'}</h2>${A.owner?'':'<button class="btn small" onclick="editStore()">Tambah toko</button>'}</div>
@@ -687,8 +757,8 @@ function renderAdmin(){
         <div class="th">${s.foto_url?`<img src="${esc(thumb(s.foto_url,120))}" alt="">`:'🏪'}</div>
         <div class="grow"><h4>${esc(s.nama)}</h4>
           <div class="meta">${esc(s.status_info)} · Mode: ${esc(s.mode||'Otomatis')}</div>
-          ${!A.owner?`<div class="meta">${s.kode_toko?'Kode toko: '+esc(s.kode_toko):'<b style="color:var(--sambal)">Belum ada kode toko</b>'}</div>`:''}
-          <div class="meta">${A.menus.filter(m=>m.id_toko===s.id).length} menu${s.batas_pesan?` · Batas pesan ${esc(fmtWaktu(s.batas_pesan))}`:''}</div></div>
+          ${!A.owner?`<div class="meta">${s.kode_toko?'Kode toko: ••••••':'<b style="color:var(--sambal)">Belum ada kode toko</b>'}</div>`:''}
+          <div class="meta">${A.menus.filter(m=>m.id_toko===s.id).length} menu</div></div>
         <div class="acts"><button class="btn small ghost" onclick="editStore('${esc(s.id)}')">Ubah</button></div>
       </div>`).join('') : `<div class="empty">Belum ada toko. Tambahkan toko pertama untuk mulai.</div>`}</div>`;
   } else if (A.tab === 'menu'){
@@ -706,25 +776,129 @@ function renderAdmin(){
       </div>`).join('') : `<div class="empty">${A.stores.length?'Belum ada menu. Tambahkan menu untuk toko Anda.':'Tambahkan toko dulu sebelum menambah menu.'}</div>`}</div>`;
     $('#ft').onchange = e => { A.filterToko = e.target.value; renderAdmin(); };
   } else {
-    const f = A.filterToko;
-    const list = A.orders.filter(o => !f || o.id_toko===f);
+    if (!A.filterTanggal) A.filterTanggal = todayWIB();
+    const f = A.filterToko, tg = A.filterTanggal;
+    const list = A.orders.filter(o => (!f || o.id_toko===f) && orderDate(o) === tg);
     const totalBaru = list.filter(o=>o.status!=='Selesai').reduce((a,o)=>a+(Number(o.total)||0),0);
+    const today = todayWIB(), nextPo = nextPreorderISO();
     p.innerHTML = `
-    <div class="panel-head"><h2>Pesanan</h2><button class="btn small ghost" onclick="loadAdmin().then(()=>toast('Data diperbarui'))">Muat ulang</button></div>
-    <div class="filters ${A.owner?'hidden':''}"><select id="ft" aria-label="Filter toko"><option value="">Semua toko</option>${A.stores.map(s=>`<option value="${esc(s.id)}" ${f===s.id?'selected':''}>${esc(s.nama)}</option>`).join('')}</select></div>
-    <p class="hint" style="margin:0 0 12px">${list.filter(o=>o.status!=='Selesai').length} pesanan belum selesai, total ${rp(totalBaru)}</p>
+    <div class="panel-head"><h2>Pesanan</h2><div class="btns">
+      <button class="btn small" onclick="openRekap()">Rekap</button>
+      <button class="btn small ghost" onclick="loadAdmin().then(()=>toast('Data diperbarui'))">Muat ulang</button></div></div>
+    <div class="filters">
+      <input type="date" id="fd" value="${esc(tg)}" aria-label="Tanggal pre-order">
+      <select id="ft" aria-label="Filter toko" class="${A.owner?'hidden':''}"><option value="">Semua toko</option>${A.stores.map(s=>`<option value="${esc(s.id)}" ${f===s.id?'selected':''}>${esc(s.nama)}</option>`).join('')}</select>
+    </div>
+    <div class="quick">
+      <button data-d="${today}" class="${tg===today?'on':''}">Hari ini</button>
+      ${nextPo!==today?`<button data-d="${nextPo}" class="${tg===nextPo?'on':''}">Besok (${esc(labelPendek(nextPo))})</button>`:''}
+      ${[...new Set(A.stores.filter(x => x.po && x.po.custom && (!f || x.id===f)).map(x => x.po.iso))].filter(d => d!==today && d!==nextPo).sort().map(d => `<button data-d="${d}" class="${tg===d?'on':''}">PO custom (${esc(labelPendek(d))})</button>`).join('')}
+    </div>
+    <p class="hint" style="margin:0 0 12px">Pre-order ${esc(labelTanggal(tg))}: ${list.length} pesanan, ${list.filter(o=>o.status!=='Selesai').length} belum selesai (${rp(totalBaru)})</p>
     <div class="alist">${list.length ? list.map(o => `
       <div class="order ${o.status==='Selesai'?'selesai':''}">
         <div class="top"><b>${esc(o.nama_pemesan)}</b><span class="when">${esc(fmtWaktu(o.waktu))}</span></div>
         <div class="meta" style="color:var(--muted);font-size:.85rem">${esc(o.nama_toko)} · ${esc(o.id)}</div>
-        ${o.tanggal_preorder?`<div style="font-size:.85rem;font-weight:700;color:var(--pandan)">📅 Untuk ${esc(labelTanggal(o.tanggal_preorder))}</div>`:''}
         <div class="items">${esc(o.ringkasan)}</div>
         ${o.catatan?`<div class="note">${esc(o.catatan)}</div>`:''}
         <div class="bottom"><b>${rp(o.total)}</b>
           <button class="btn small ${o.status==='Selesai'?'ghost':''}" onclick="toggleOrder('${esc(o.id)}')">${o.status==='Selesai'?'Tandai belum selesai':'Tandai selesai'}</button></div>
-      </div>`).join('') : `<div class="empty">Belum ada pesanan masuk.</div>`}</div>`;
+      </div>`).join('') : `<div class="empty">Belum ada pesanan untuk pre-order ${esc(labelTanggal(tg))}.</div>`}</div>`;
     $('#ft').onchange = e => { A.filterToko = e.target.value; renderAdmin(); };
+    $('#fd').onchange = e => { A.filterTanggal = e.target.value || todayWIB(); renderAdmin(); };
+    p.querySelectorAll('.quick button').forEach(b => b.onclick = () => { A.filterTanggal = b.dataset.d; renderAdmin(); });
   }
+}
+
+/* --- Promosi pemilik toko (pesan WhatsApp) --- */
+function promoText(d){
+  const parts = ['Halo Bians! 👋', `*${d.me.nama}* sudah buka dan siap menerima pre-order untuk *${d.preorder.label}* 🍱`, '', 'Toko yang menerima pesanan hari ini:'];
+  d.stores.forEach((t,i) => parts.push(`${i+1}. *${t.nama}*`));
+  parts.push('', `Pesan sekarang 👉 ${shareUrl()}`);
+  return parts.join('\n');
+}
+async function renderPromo(p){
+  p.innerHTML = `<div class="panel-head"><h2>Promosi</h2></div><div class="loading">Menyiapkan pesan…</div>`;
+  let d;
+  try { d = await api('ownerPromo'); } catch(err){ if (A.tab==='promosi') p.innerHTML = `<div class="empty">Gagal memuat: ${esc(err.message)}</div>`; return; }
+  if (A.tab !== 'promosi') return;
+  const bisa = d.me && d.me.bisaPesan;
+  p.innerHTML = `
+    <div class="panel-head"><h2>Promosi</h2><button class="btn small ghost" id="pr_ref">Muat ulang</button></div>
+    <p class="hint" style="margin:0 0 4px">Kabari Bians bahwa toko Anda sedang menerima pesanan. Salin pesan di bawah atau bagikan langsung ke grup WhatsApp.</p>
+    ${bisa ? '' : `<div class="notice">${esc(d.me ? d.me.nama : 'Toko Anda')} sedang tidak menerima pesanan (${esc(d.me ? (d.me.lewatBatas && d.me.buka ? 'batas pesan hari ini sudah lewat' : d.me.info) : 'tutup')}). Pesan promosi bisa dibagikan saat toko menerima pesanan.</div>`}
+    <pre class="rekap-text" id="pr_text">${esc(bisa ? promoText(d) : '')}</pre>
+    <div class="actions">
+      <button type="button" class="btn ghost" id="pr_copy" ${bisa?'':'disabled'}>Salin</button>
+      <button type="button" class="btn wa" id="pr_wa" style="width:auto" ${bisa?'':'disabled'}>Bagikan ke WhatsApp</button>
+    </div>`;
+  if (!bisa) $('#pr_text', p).style.display = 'none';
+  $('#pr_ref', p).onclick = () => renderPromo(p);
+  $('#pr_copy', p).onclick = async () => { const t = promoText(d); try { await navigator.clipboard.writeText(t); toast('Pesan promosi disalin'); } catch(e){ prompt('Salin pesan ini:', t); } };
+  $('#pr_wa', p).onclick = () => window.open('https://wa.me/?text=' + encodeURIComponent(promoText(d)), '_blank');
+}
+
+/* --- Rekap pesanan per menu (untuk disalin ke WhatsApp) --- */
+function rekapText(storeId, tg){
+  const orders = A.orders.filter(o => o.id_toko === storeId && orderDate(o) === tg).reverse(); // urut dari pemesan pertama
+  const menus = A.menus.filter(m => m.id_toko === storeId).sort((a,b) => (Number(a.urutan)||0) - (Number(b.urutan)||0));
+  const order = new Map(menus.map((m,i) => [m.id, i]));
+  const groups = new Map(); let porsi = 0, total = 0;
+  orders.forEach(o => {
+    total += Number(o.total) || 0;
+    (o.items || []).forEach(it => {
+      porsi += it.qty;
+      const m = menus.find(x => x.id === it.id);
+      const key = it.id;
+      const nama = m ? m.nama : String(it.nama).replace(/\s*\(.*\)$/, '');
+      let varian = '';
+      if (it.varian_id && m) varian = ((m.varian||[]).find(v => v.id === it.varian_id) || {}).nama || '';
+      if (!varian) { const mm = String(it.nama).match(/\(([^)]*)\)$/); if (mm && it.varian_id) varian = mm[1]; }
+      if (!groups.has(key)) groups.set(key, { nama, rows: [] });
+      groups.get(key).rows.push({ pemesan: o.nama_pemesan, varian, qty: it.qty });
+    });
+  });
+  const [y,m,d] = tg.split('-').map(Number);
+  const head = `Pre-Order, ${HARI_ID[new Date(y, m-1, d).getDay()]} ${d} ${BLN[m-1]}`;
+  if (!groups.size) return { text: `${head}\n\nBelum ada pesanan.`, porsi: 0, total: 0, count: 0 };
+  const keys = [...groups.keys()].sort((a,b) => (order.has(a)?order.get(a):999) - (order.has(b)?order.get(b):999));
+  const parts = [head, ''];
+  keys.forEach(k => {
+    const g = groups.get(k);
+    parts.push(`*${g.nama}*`);
+    g.rows.forEach((r,i) => parts.push(`${i+1}. ${[r.pemesan, r.varian].filter(Boolean).join(' - ')}${r.qty>1?` (${r.qty}x)`:''}`));
+    parts.push('');
+  });
+  // Catatan ditulis sekali per pesanan, di bagian tersendiri
+  const notes = orders.filter(o => String(o.catatan||'').trim());
+  if (notes.length){
+    parts.push('*Catatan*');
+    notes.forEach(o => parts.push(`- ${o.nama_pemesan}: ${String(o.catatan).trim()}`));
+    parts.push('');
+  }
+  parts.push(`Total pesanan: ${porsi} porsi · ${rp(total)}`);
+  return { text: parts.join('\n'), porsi, total, count: orders.length };
+}
+function openRekap(){
+  const stores = A.stores;
+  if (!stores.length) return toast('Belum ada toko.');
+  let sid = A.owner ? stores[0].id : (A.filterToko || (stores.find(s => A.orders.some(o => o.id_toko===s.id && orderDate(o)===A.filterTanggal)) || stores[0]).id);
+  const d = openSheet(`
+    <h2>Rekap pesanan</h2>
+    <p class="hint" style="margin:0 0 8px">Pre-order ${esc(labelTanggal(A.filterTanggal))}. Salin lalu tempel di grup WhatsApp.</p>
+    ${A.owner ? '' : `<select id="rk_toko" aria-label="Pilih toko">${stores.map(s=>`<option value="${esc(s.id)}" ${s.id===sid?'selected':''}>${esc(s.nama)}</option>`).join('')}</select>`}
+    <pre class="rekap-text" id="rk_text"></pre>
+    <div class="actions">
+      <button type="button" class="btn ghost" id="rk_close">Tutup</button>
+      <button type="button" class="btn ghost" id="rk_copy">Salin</button>
+      <button type="button" class="btn wa" id="rk_wa" style="width:auto">Bagikan ke WhatsApp</button>
+    </div>`);
+  const draw = () => { $('#rk_text', d).textContent = rekapText(sid, A.filterTanggal).text; };
+  draw();
+  if (!A.owner) $('#rk_toko', d).onchange = e => { sid = e.target.value; draw(); };
+  $('#rk_close', d).onclick = () => d.remove();
+  $('#rk_copy', d).onclick = async () => { const t = $('#rk_text', d).textContent; try { await navigator.clipboard.writeText(t); toast('Rekap disalin'); } catch(e){ prompt('Salin rekap ini:', t); } };
+  $('#rk_wa', d).onclick = () => window.open('https://wa.me/?text=' + encodeURIComponent($('#rk_text', d).textContent), '_blank');
 }
 
 async function toggleOrder(id){
@@ -752,6 +926,7 @@ function compressImage(file, max=800){
 }
 async function uploadFrom(input, preview, hidden){
   const file = input.files[0]; if (!file) return;
+  const fn = input.parentElement && input.parentElement.querySelector('.fn'); if (fn) fn.textContent = file.name;
   preview.classList.remove('hidden'); preview.style.opacity = .4;
   try {
     const data = await compressImage(file);
@@ -776,33 +951,60 @@ function editStore(id){
     <form id="sf">
       <label for="s_nama">Nama toko</label><input id="s_nama" type="text" required value="${esc(s.nama||'')}" ${A.owner?'readonly disabled':''}>
       ${A.owner?'<p class="hint">Nama toko hanya bisa diubah admin.</p>':`
-      <label for="s_kode">Kode toko</label><input id="s_kode" type="text" autocomplete="off" value="${esc(s.kode_toko||'')}" placeholder="Contoh: warunga88">
+      <label for="s_kode">Kode toko</label>${pwField(`<input id="s_kode" type="password" autocomplete="new-password" value="${esc(s.kode_toko||'')}" placeholder="Contoh: warunga88">`)}
       <p class="hint">Dipakai pemilik toko untuk masuk dan mengelola tokonya. Harus berbeda untuk setiap toko.</p>`}
       <label for="s_desk">Deskripsi singkat</label><input id="s_desk" type="text" value="${esc(s.deskripsi||'')}" placeholder="Contoh: Nasi campur dan aneka lauk">
       <label>Foto atau logo toko <span style="font-weight:400;color:var(--muted)">(opsional)</span></label>
-      <input id="s_file" type="file" accept="image/*">
+      <div class="filepick"><input id="s_file" type="file" accept="image/*"><label for="s_file">📷 Pilih foto</label><span class="fn">${s.foto_url?'Foto sudah ada':'Belum ada foto'}</span></div>
       <img id="s_prev" class="foto-prev ${s.foto_url?'':'hidden'}" src="${esc(s.foto_url||'')}" alt="">
       <input id="s_foto" type="hidden" value="${esc(s.foto_url||'')}">
 
-      <label for="s_mode">Status buka</label>
+      <label for="s_mode">Status terima pesanan</label>
       <select id="s_mode">
         ${['Otomatis','Paksa Buka','Paksa Tutup'].map(m=>`<option ${s.mode===m?'selected':''}>${m}</option>`).join('')}
       </select>
-      <p class="hint">Otomatis mengikuti jadwal di bawah (WIB). Paksa Buka/Tutup mengabaikan jadwal.</p>
+      <p class="hint">Otomatis mengikuti jadwal terima pesanan di bawah (WIB). Paksa Buka/Tutup mengabaikan jadwal.</p>
 
-      <label>Jadwal buka</label>
-      <table class="sched"><tbody>
-        ${HARI.map((h,i)=>{ const on = !!(s[h+'_buka']&&s[h+'_tutup']); return `
-        <tr data-h="${h}"><td><label class="check" style="margin:0"><input type="checkbox" class="on" ${on||!id?'checked':''}> ${NAMA_HARI[i]}</label></td>
-          <td><input type="time" class="b" value="${esc(s[h+'_buka']|| (id?'':'08:00'))}" aria-label="Jam buka ${NAMA_HARI[i]}"></td>
-          <td><input type="time" class="t" value="${esc(s[h+'_tutup']|| (id?'':'17:00'))}" aria-label="Jam tutup ${NAMA_HARI[i]}"></td></tr>`; }).join('')}
-      </tbody></table>
-      <p class="hint">Hilangkan centang untuk hari libur.</p>
+      ${(() => {
+        const custom = s.po_mode === 'custom';
+        const hariOn = HARI.map(h => !!(s[h+'_buka'] && s[h+'_tutup']));
+        const first = HARI.find(h => s[h+'_buka'] && s[h+'_tutup']);
+        const beda = new Set(HARI.filter(h => s[h+'_buka']).map(h => s[h+'_buka']+'-'+s[h+'_tutup'])).size > 1;
+        const isNew = !id;
+        return `
+      <label>Tanggal pre-order</label>
+      <div class="chips mode-chips" role="radiogroup" aria-label="Tanggal pre-order">
+        <button type="button" class="chip ${custom?'':'on'}" data-m="besok" role="radio" aria-checked="${!custom}">Besok (otomatis)<small>Hari kerja berikutnya</small></button>
+        <button type="button" class="chip ${custom?'on':''}" data-m="custom" role="radio" aria-checked="${custom}">Custom<small>Pilih tanggal</small></button>
+      </div>
+      <div id="po_besok" class="${custom?'hidden':''}">
+        <p class="hint">Pesanan untuk hari kerja berikutnya${s.po && !s.po.custom && s.po.label ? ` (saat ini: <b>${esc(s.po.label)}</b>)` : ''}.</p>
+        <label>Jadwal terima pesanan</label>
+        <div class="daychips" role="group" aria-label="Hari terima pesanan">
+          ${INISIAL.map((h,i) => `<label><input type="checkbox" class="jh" value="${i}" ${(isNew ? i<5 : hariOn[i])?'checked':''}><span>${h}</span></label>`).join('')}
+        </div>
+        <div class="batas-row" style="margin-top:8px">
+          <input type="time" id="j_mulai" value="${esc(first ? s[first+'_buka'] : '06:00')}" aria-label="Jam mulai terima pesanan">
+          <span style="color:var(--muted)">–</span>
+          <input type="time" id="j_akhir" value="${esc(first ? s[first+'_tutup'] : '17:00')}" aria-label="Batas akhir terima pesanan">
+        </div>
+        <p class="hint">Mingguan: pesanan diterima tiap hari yang dipilih pada jam ini.${beda ? ' Jam sebelumnya berbeda per hari dan akan disamakan saat disimpan.' : ''}</p>
+      </div>
+      <div id="po_custom" class="${custom?'':'hidden'}">
+        <input type="date" id="po_tgl" value="${esc((s.po_tanggal||'').slice(0,10))}" aria-label="Tanggal pre-order custom" style="margin-top:8px">
+        <label>Jadwal terima pesanan (custom)</label>
+        <small style="display:block;color:var(--muted);font-weight:600;margin:0 0 4px">Mulai</small>
+        <input type="datetime-local" id="po_mulai" value="${esc((s.po_mulai||'').slice(0,16))}" aria-label="Mulai terima pesanan">
+        <small style="display:block;color:var(--muted);font-weight:600;margin:8px 0 4px">Sampai</small>
+        <input type="datetime-local" id="po_sampai" value="${esc((s.po_sampai||'').slice(0,16))}" aria-label="Batas akhir terima pesanan">
+        <p class="hint">Setelah tanggal pre-order lewat, toko otomatis kembali ke mode "Besok".</p>
+      </div>`; })()}
 
-      <label for="s_batas">Batas waktu pemesanan <span style="font-weight:400;color:var(--muted)">(opsional)</span></label>
-      <input id="s_batas" type="datetime-local" value="${esc((s.batas_pesan||'').slice(0,16))}">
       <label for="s_ambil">Waktu pengambilan <span style="font-weight:400;color:var(--muted)">(opsional)</span></label>
-      <input id="s_ambil" type="datetime-local" value="${esc((s.waktu_ambil||'').slice(0,16))}">
+      <div class="batas-row">
+        <input id="s_ambil" type="datetime-local" value="${esc((s.waktu_ambil||'').slice(0,16))}">
+        <button type="button" class="btn small ghost" id="s_ambil_reset">Reset</button>
+      </div>
       <div class="err" id="se"></div>
       <div class="actions">
         ${id && !A.owner?`<button type="button" class="btn danger" id="s_del">Hapus toko</button>`:''}
@@ -810,10 +1012,16 @@ function editStore(id){
         <button class="btn" id="s_save">Simpan toko</button>
       </div>
     </form>`);
-  const syncRow = tr => { const on = tr.querySelector('.on').checked; tr.querySelectorAll('input[type=time]').forEach(i=>i.disabled=!on); };
-  d.querySelectorAll('.sched tr').forEach(tr => { syncRow(tr); tr.querySelector('.on').onchange = () => syncRow(tr); });
+  let poMode = s.po_mode === 'custom' ? 'custom' : 'besok';
+  d.querySelectorAll('.mode-chips .chip').forEach(b => b.onclick = () => {
+    poMode = b.dataset.m;
+    d.querySelectorAll('.mode-chips .chip').forEach(x => { x.classList.toggle('on', x === b); x.setAttribute('aria-checked', x === b); });
+    $('#po_besok', d).classList.toggle('hidden', poMode !== 'besok'); $('#po_custom', d).classList.toggle('hidden', poMode !== 'custom');
+  });
+  bindPw(d);
   $('#s_file', d).onchange = e => uploadFrom(e.target, $('#s_prev', d), $('#s_foto', d));
   $('#s_cancel', d).onclick = () => d.remove();
+  $('#s_ambil_reset', d).onclick = () => { $('#s_ambil', d).value = ''; };
   if (id && !A.owner) $('#s_del', d).onclick = async () => {
     if (!confirm(`Hapus toko "${s.nama}" beserta semua menunya? Riwayat pesanan tetap tersimpan.`)) return;
     try { await api('deleteStore', { id }); d.remove(); toast('Toko dihapus'); A.stores = A.stores.filter(x=>x.id!==id); A.menus = A.menus.filter(x=>x.id_toko!==id); renderAdmin(); } catch(err){ $('#se', d).textContent = err.message; }
@@ -821,14 +1029,25 @@ function editStore(id){
   $('#sf', d).onsubmit = async e => {
     e.preventDefault();
     const o = { id: id||'', deskripsi: $('#s_desk',d).value.trim(), foto_url: $('#s_foto',d).value,
-      mode: $('#s_mode',d).value, batas_pesan: $('#s_batas',d).value, waktu_ambil: $('#s_ambil',d).value };
+      mode: $('#s_mode',d).value, waktu_ambil: $('#s_ambil',d).value };
+    o.batas_pesan = ''; // batas pesan kini menyatu dengan jadwal terima pesanan
     if (!A.owner){ o.nama = $('#s_nama',d).value.trim(); o.kode_toko = $('#s_kode',d).value.trim(); }
     let bad = '';
-    d.querySelectorAll('.sched tr').forEach(tr => {
-      const h = tr.dataset.h, on = tr.querySelector('.on').checked, b = tr.querySelector('.b').value, t = tr.querySelector('.t').value;
-      o[h+'_buka'] = on ? b : ''; o[h+'_tutup'] = on ? t : '';
-      if (on && (!b || !t || t <= b)) bad = `Jam tutup hari ${NAMA_HARI[HARI.indexOf(h)]} harus setelah jam buka.`;
-    });
+    o.po_mode = poMode;
+    if (poMode === 'custom'){
+      const tgl = $('#po_tgl',d).value, mulai = $('#po_mulai',d).value, sampai = $('#po_sampai',d).value;
+      if (!tgl || !mulai || !sampai) bad = 'Lengkapi tanggal pre-order serta waktu mulai dan sampai.';
+      else if (tgl <= todayWIB()) bad = 'Tanggal pre-order custom harus setelah hari ini.';
+      else if (sampai <= mulai) bad = 'Waktu "Sampai" harus setelah waktu "Mulai".';
+      else if (sampai.slice(0,10) > tgl) bad = 'Batas terima pesanan tidak boleh melewati tanggal pre-order.';
+      o.po_tanggal = tgl; o.po_mulai = mulai; o.po_sampai = sampai;
+    } else {
+      const hari = [...d.querySelectorAll('.jh:checked')].map(c => Number(c.value));
+      const jm = $('#j_mulai',d).value, ja = $('#j_akhir',d).value;
+      if (hari.length && (!jm || !ja)) bad = 'Isi jam mulai dan batas akhir terima pesanan.';
+      else if (hari.length && ja <= jm) bad = 'Batas akhir harus setelah jam mulai.';
+      HARI.forEach((h,i) => { const on = hari.includes(i); o[h+'_buka'] = on ? jm : ''; o[h+'_tutup'] = on ? ja : ''; });
+    }
     if (bad){ $('#se',d).textContent = bad; return; }
     const btn = $('#s_save', d); btn.disabled = true; btn.textContent = 'Menyimpan…';
     try {
@@ -855,7 +1074,7 @@ function editMenu(id){
       <p class="hint">Jika ada varian, setiap varian memakai harganya sendiri dan isian Harga di atas tidak dipakai.</p>
       <label for="m_desk">Deskripsi</label><textarea id="m_desk" placeholder="Contoh: Nasi, ayam goreng, sambal, lalapan">${esc(m.deskripsi||'')}</textarea>
       <label>Foto menu</label>
-      <input id="m_file" type="file" accept="image/*">
+      <div class="filepick"><input id="m_file" type="file" accept="image/*"><label for="m_file">📷 Pilih foto</label><span class="fn">${m.foto_url?'Foto sudah ada':'Belum ada foto'}</span></div>
       <img id="m_prev" class="foto-prev ${m.foto_url?'':'hidden'}" src="${esc(m.foto_url||'')}" alt="">
       <input id="m_foto" type="hidden" value="${esc(m.foto_url||'')}">
       <label for="m_urut">Urutan tampil</label><input id="m_urut" type="number" value="${esc(m.urutan||'')}" placeholder="1, 2, 3…">
