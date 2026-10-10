@@ -136,6 +136,15 @@ input:focus,select:focus,textarea:focus{border-color:var(--pandan);outline:none}
 .cartbar small{opacity:.8;display:block}
 .cartbar b{font-size:1.15rem}
 .cartbar .btn{background:var(--kunyit);color:var(--ink)}
+.head-pills{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:6px}
+.head-pills .pill{margin-top:0}
+.kbadge{display:inline-flex;align-items:center;gap:2px;border:1.5px solid var(--pandan);border-radius:999px;padding:1px 2px 1px 10px;font-size:.8rem;font-weight:700;color:var(--pandan);background:#fff;line-height:1.6}
+.kbadge .kk{opacity:.75}
+.kbadge .ka{letter-spacing:.02em}
+.kbadge button{border:0;background:none;color:var(--pandan);width:28px;height:24px;display:inline-flex;align-items:center;justify-content:center;border-radius:999px;padding:0}
+.kbadge button:hover{background:var(--leaf)}
+.kbadge svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;pointer-events:none}
+.badge-row{display:grid;grid-template-columns:110px 1fr;gap:8px}
 .po-day{display:flex;align-items:center;gap:8px;background:var(--pandan);color:#fff;border-radius:var(--r-sm);padding:10px 14px;margin:14px 0 4px;font-size:.95rem}
 .recap{position:fixed;inset:0;z-index:25;background:rgba(15,22,17,.55);display:flex;align-items:flex-end;justify-content:center}
 .recap .box{background:var(--paper);width:100%;max-width:560px;max-height:90vh;overflow:auto;border-radius:22px 22px 0 0;padding:20px 18px calc(20px + env(safe-area-inset-bottom,0px))}
@@ -241,9 +250,35 @@ const API_URL = 'https://script.google.com/macros/s/AKfycbxWXi3LDOOT-x1nIlx1usib
 const HARI = ['senin','selasa','rabu','kamis','jumat','sabtu','minggu'];
 const NAMA_HARI = ['Senin','Selasa','Rabu','Kamis','Jumat','Sabtu','Minggu'];
 // Nomor versi aplikasi: NAIKKAN setiap commit baru, supaya link di WhatsApp selalu memuat versi terbaru
-const APP_VERSION = 12;
-const SITE_URL = 'https://byru5.github.io/preorder-app/';
-const shareUrl = () => (window.DEMO_API ? SITE_URL : location.origin + location.pathname) + '?v=' + APP_VERSION + '#/';
+const APP_VERSION = 13;
+// Link yang dibagikan di WhatsApp: selalu alamat utama aplikasi
+const SHARE_URL = 'https://byru5.github.io/preorder-app';
+const shareUrl = () => SHARE_URL;
+
+/* ===== Pembaruan otomatis =====
+   GitHub Pages mengizinkan browser menyimpan salinan halaman ~10 menit.
+   Saat dibuka (dan saat kembali ke tab), aplikasi mengecek versi terbaru di server tanpa cache;
+   jika ada versi lebih baru, halaman dimuat ulang sendiri sehingga alamat utama selalu menampilkan versi terbaru. */
+async function cekVersiBaru(){
+  if (window.DEMO_API || !/^https?:/.test(location.protocol)) return;
+  try {
+    const r = await fetch(location.origin + location.pathname + '?cek=' + Date.now(), { cache: 'no-store' });
+    if (!r.ok) return;
+    const m = (await r.text()).match(/const APP_VERSION = (\d+);/);
+    const terbaru = m ? Number(m[1]) : 0;
+    if (terbaru > APP_VERSION) {
+      const sudah = Number(sess.get('po_update_ke') || 0);
+      toast('Memperbarui ke versi terbaru…');
+      if (sudah === terbaru) {
+        // Muat ulang biasa belum cukup (cache bandel): buka alamat dengan penanda versi baru
+        location.replace(location.origin + location.pathname + '?v=' + terbaru + location.hash);
+      } else {
+        sess.set('po_update_ke', terbaru);
+        setTimeout(() => location.reload(), 600);
+      }
+    } else sess.del('po_update_ke');
+  } catch(e){}
+}
 
 /* ===== Util ===== */
 const $ = (s, el=document) => el.querySelector(s);
@@ -491,7 +526,10 @@ function renderStore(data){
     <header class="store-head">
       <h1>${esc(s.nama)}</h1>
       ${s.deskripsi?`<p>${esc(s.deskripsi)}</p>`:''}
-      <span class="pill open">${esc(s.info)}</span>
+      <div class="head-pills">
+        <span class="pill open">${esc(s.info)}</span>
+        ${s.badge_angka ? `<span class="kbadge">${s.badge_huruf ? `<span class="kk">${esc(s.badge_huruf)}-</span>` : ''}<span class="ka">${esc(s.badge_angka)}</span><button type="button" id="copyAngka" aria-label="Salin ${esc(s.badge_angka)}" title="Salin"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1"/></svg></button></span>` : ''}
+      </div>
     </header>
     <div class="po-day">📅 <span>Pre-order untuk <b>${esc(poOf(s).label)}</b></span></div>
     ${(s.batas_label||s.waktu_ambil)?`<div class="po">
@@ -547,6 +585,8 @@ function renderStore(data){
   </div></div>` : ''}`;
 
   document.querySelectorAll('[data-photo]').forEach(b => b.onclick = () => showPhoto(menus.find(m => m.id === b.dataset.photo)));
+  const cpy = $('#copyAngka');
+  if (cpy) cpy.onclick = async () => { try { await navigator.clipboard.writeText(s.badge_angka); toast('Disalin: ' + s.badge_angka); } catch(e){ prompt('Salin angka ini:', s.badge_angka); } };
   if (!canOrder || !menus.length) return;
   const priceOf = {};
   menus.forEach(m => { priceOf[m.id + '|'] = m.harga; (m.varian||[]).forEach(v => priceOf[m.id + '|' + v.id] = v.harga); });
@@ -633,11 +673,10 @@ function waMessage(storeName, nama, po){
   const open = (ALL ? ALL.stores : []).filter(x => x.buka);
   const url = shareUrl();
   po = po || { label: preorderLabel(), custom: false };
-  const parts = [`🍱 Pre-Order ${po.custom ? '' : 'Besok '}(${po.label})`, `${nama} sudah pesan di ${storeName} ✅`, '', 'Toko yang menerima pesanan hari ini:'];
+  const parts = [`🍱 *Pre-Order (${po.label})*`, `${nama} sudah pesan di ${storeName} ✅`, '', 'Toko yang menerima pesanan hari ini:'];
   open.forEach((t, i) => {
-    parts.push(`${i+1}. *${t.nama}*`);
+    parts.push(`${i+1}. *${t.nama}*${t.tutup_label ? ` s/d _${t.tutup_label}_` : ''}`);
     if (t.deskripsi) parts.push(`_${t.deskripsi}_`);
-    if (t.tutup_label) parts.push(`pesan s/d ${t.tutup_label}`);
     parts.push('');
   });
   parts.push(`Yuk ikut pesan 👉 ${url}`);
@@ -728,6 +767,8 @@ function viewAdminGate(){
 function adminLogout(){ sess.del(authKey()); sess.del('po_toko_nama'); sess.del(adminCacheKey()); A._loaded = false; viewAdmin(); }
 
 const adminCacheKey = () => A.owner ? 'po_owner_data' : 'po_admin_data';
+// Setelah toko/menu diubah, data tampilan pembeli di perangkat ini dimuat ulang dari server
+const bersihkanCachePembeli = () => { ALL = null; try { localStorage.removeItem('po_all'); } catch(e){} };
 async function loadAdmin(){
   if (!A._loaded){
     try { const c = JSON.parse(sess.get(adminCacheKey()) || 'null'); if (c){ A.stores = c.stores; A.menus = c.menus; A.orders = c.orders; renderAdmin(); } } catch(e){}
@@ -953,6 +994,12 @@ function editStore(id){
       <label for="s_kode">Kode toko</label>${pwField(`<input id="s_kode" type="password" autocomplete="new-password" value="${esc(A.owner ? (sess.get('po_toko')||'') : (s.kode_toko||''))}" placeholder="Contoh: warunga88">`)}
       <p class="hint">${A.owner ? 'Kode untuk masuk ke halaman pemilik toko ini. Minimal 4 karakter dan harus berbeda dari toko lain. Setelah diganti, gunakan kode baru saat masuk berikutnya.' : 'Dipakai pemilik toko untuk masuk dan mengelola tokonya. Harus berbeda untuk setiap toko.'}</p>
       <label for="s_desk">Deskripsi singkat</label><input id="s_desk" type="text" value="${esc(s.deskripsi||'')}" placeholder="Contoh: Nasi campur dan aneka lauk">
+      <label for="s_bhuruf">Badge info <span style="font-weight:400;color:var(--muted)">(opsional)</span></label>
+      <div class="badge-row">
+        <input id="s_bhuruf" type="text" maxlength="12" value="${esc(s.badge_huruf||'')}" placeholder="Huruf" aria-label="Huruf badge">
+        <input id="s_bangka" type="text" inputmode="numeric" maxlength="30" value="${esc(s.badge_angka||'')}" placeholder="Angka" aria-label="Angka badge">
+      </div>
+      <p class="hint">Tampil di halaman toko sebagai "Huruf-Angka" dengan tombol salin untuk angkanya. Kosongkan angka jika tidak ingin ditampilkan.</p>
       <label>Foto atau logo toko <span style="font-weight:400;color:var(--muted)">(opsional)</span></label>
       <div class="filepick"><input id="s_file" type="file" accept="image/*"><label for="s_file">📷 Pilih foto</label><span class="fn">${s.foto_url?'Foto sudah ada':'Belum ada foto'}</span></div>
       <img id="s_prev" class="foto-prev ${s.foto_url?'':'hidden'}" src="${esc(s.foto_url||'')}" alt="">
@@ -1023,7 +1070,7 @@ function editStore(id){
   $('#s_ambil_reset', d).onclick = () => { $('#s_ambil', d).value = ''; };
   if (id && !A.owner) $('#s_del', d).onclick = async () => {
     if (!confirm(`Hapus toko "${s.nama}" beserta semua menunya? Riwayat pesanan tetap tersimpan.`)) return;
-    try { await api('deleteStore', { id }); d.remove(); toast('Toko dihapus'); A.stores = A.stores.filter(x=>x.id!==id); A.menus = A.menus.filter(x=>x.id_toko!==id); renderAdmin(); } catch(err){ $('#se', d).textContent = err.message; }
+    try { await api('deleteStore', { id }); d.remove(); bersihkanCachePembeli(); toast('Toko dihapus'); A.stores = A.stores.filter(x=>x.id!==id); A.menus = A.menus.filter(x=>x.id_toko!==id); renderAdmin(); } catch(err){ $('#se', d).textContent = err.message; }
   };
   $('#sf', d).onsubmit = async e => {
     e.preventDefault();
@@ -1031,6 +1078,7 @@ function editStore(id){
       mode: $('#s_mode',d).value, waktu_ambil: $('#s_ambil',d).value };
     o.batas_pesan = ''; // batas pesan kini menyatu dengan jadwal terima pesanan
     o.nama = $('#s_nama',d).value.trim(); o.kode_toko = $('#s_kode',d).value.trim();
+    o.badge_huruf = $('#s_bhuruf',d).value.trim(); o.badge_angka = $('#s_bangka',d).value.trim();
     if (!o.nama){ $('#se',d).textContent = 'Nama toko wajib diisi.'; return; }
     if (A.owner && o.kode_toko.length < 4){ $('#se',d).textContent = 'Kode toko minimal 4 karakter.'; return; }
     let bad = '';
@@ -1052,7 +1100,7 @@ function editStore(id){
     if (bad){ $('#se',d).textContent = bad; return; }
     const btn = $('#s_save', d); btn.disabled = true; btn.textContent = 'Menyimpan…';
     try {
-      const r = await api(act('saveStore'), { store:o }); d.remove();
+      const r = await api(act('saveStore'), { store:o }); d.remove(); bersihkanCachePembeli();
       if (A.owner){
         const kodeBaru = o.kode_toko !== sess.get('po_toko');
         sess.set('po_toko', o.kode_toko); sess.set('po_toko_nama', o.nama);
@@ -1111,7 +1159,7 @@ function editMenu(id){
   $('#m_addv', d).onclick = () => addVar();
   if (id) $('#m_del', d).onclick = async () => {
     if (!confirm(`Hapus menu "${m.nama}"?`)) return;
-    try { await api(act('deleteMenu'), { id }); d.remove(); toast('Menu dihapus'); A.menus = A.menus.filter(x=>x.id!==id); renderAdmin(); } catch(err){ $('#me', d).textContent = err.message; }
+    try { await api(act('deleteMenu'), { id }); d.remove(); bersihkanCachePembeli(); toast('Menu dihapus'); A.menus = A.menus.filter(x=>x.id!==id); renderAdmin(); } catch(err){ $('#me', d).textContent = err.message; }
   };
   $('#mf', d).onsubmit = async e => {
     e.preventDefault();
@@ -1122,7 +1170,7 @@ function editMenu(id){
       deskripsi: $('#m_desk',d).value.trim(), foto_url: $('#m_foto',d).value, urutan: $('#m_urut',d).value, tersedia: $('#m_ada',d).checked ? 'TRUE':'FALSE', varian };
     const btn = $('#m_save', d); btn.disabled = true; btn.textContent = 'Menyimpan…';
     try {
-      const r = await api(act('saveMenu'), { menu:o }); d.remove(); toast('Menu disimpan');
+      const r = await api(act('saveMenu'), { menu:o }); d.remove(); bersihkanCachePembeli(); toast('Menu disimpan');
       if (r.menu){ const i = A.menus.findIndex(x=>x.id===r.id); if (i>=0) A.menus[i] = r.menu; else A.menus.push(r.menu); renderAdmin(); }
       else loadAdmin();
     }
@@ -1131,6 +1179,8 @@ function editMenu(id){
 }
 
 route();
+cekVersiBaru();
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') cekVersiBaru(); });
 </script>
 </body>
 </html>
