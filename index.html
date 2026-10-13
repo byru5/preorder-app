@@ -117,11 +117,23 @@ input:focus,select:focus,textarea:focus{border-color:var(--pandan);outline:none}
 .vrow .vn{font-weight:600;font-size:.94rem}
 .vrow .vp{color:var(--pandan);font-weight:700;font-size:.88rem}
 .vrow.off{opacity:.5}
-.vedit{display:grid;grid-template-columns:1fr 110px auto auto;gap:8px;align-items:center;margin-top:8px}
+.vedit{display:grid;grid-template-columns:1fr 96px 74px auto auto;gap:8px;align-items:center;margin-top:8px}
+.stok-off .vedit{grid-template-columns:1fr 110px auto auto}
+.stok-off .vs{display:none}
+.vhead{display:grid;grid-template-columns:1fr 96px 74px auto auto;gap:8px;font-size:.78rem;font-weight:700;color:var(--muted);margin-top:8px}
+.vhead.stok-off{grid-template-columns:1fr 110px auto auto}
+.vhead span:nth-child(3){text-align:center}
+.vedit .vf{margin:0;display:block;min-width:0}
+.vedit .vf small{display:none;font-size:.74rem;font-weight:700;color:var(--muted);margin-bottom:2px}
+.vedit .vf input{width:100%;font-weight:400}
+.vedit input.vs{padding:10px 8px;text-align:center}
+.stok-off .vf.vs{display:none}
+.sisa{font-size:.76rem;font-weight:700;color:#8A5A00;background:#FCEBD0;border-radius:999px;padding:1px 8px;margin-left:6px;white-space:nowrap}
 .vedit input[type=text],.vedit input[type=number]{padding:10px}
 .vedit .check{margin:0;font-size:.85rem}
 .vedit .x{border:0;background:none;color:var(--sambal);font-weight:700;font-size:1.2rem;padding:4px 6px}
-@media(max-width:420px){.vedit{grid-template-columns:1fr 92px}.vedit .check{grid-column:1}.vedit .x{justify-self:end}}
+@media(max-width:420px){.vhead{display:none!important}.vedit .vf small{display:block}.vedit{padding-bottom:10px;border-bottom:1px dashed var(--line)}
+.vedit,.stok-off .vedit{grid-template-columns:1fr 1fr 70px}.vedit .vn{grid-column:1 / -1}.stok-off .vedit .vh{grid-column:1 / span 2}.vedit .check{grid-column:1 / span 2}.vedit .x{justify-self:end}}
 .stepper{display:flex;align-items:center;gap:6px}
 .stepper button{width:36px;height:36px;border-radius:50%;border:1.5px solid var(--pandan);background:#fff;color:var(--pandan);padding:0;display:inline-flex;align-items:center;justify-content:center;flex:none;-webkit-tap-highlight-color:transparent}
 .stepper button svg{width:14px;height:14px;display:block;stroke:currentColor;stroke-width:2.6;stroke-linecap:round;fill:none;pointer-events:none}
@@ -160,7 +172,9 @@ input:focus,select:focus,textarea:focus{border-color:var(--pandan);outline:none}
 .recap .actions .btn{flex:1}
 .btn.wa{background:#1FA855;color:#fff;width:100%;display:flex;align-items:center;justify-content:center;gap:8px;font-size:1.02rem}
 .btn.wa:hover{background:#178a45}
-.share-note{color:var(--muted);font-size:.88rem;margin:8px 0 14px}
+.share-note{display:flex;gap:10px;align-items:flex-start;text-align:left;background:#E7F7EE;border:1.5px solid #9BD8B3;border-left:5px solid #1FA855;color:#14532D;border-radius:var(--r-sm);padding:11px 14px;font-size:.9rem;line-height:1.45;margin:4px 0 12px}
+.share-note .ic{flex:none;width:28px;height:28px;border-radius:50%;background:#1FA855;color:#fff;display:flex;align-items:center;justify-content:center;font-size:.95rem}
+.share-note b{display:block;font-size:.95rem;margin-bottom:1px}
 .done{text-align:center;padding:40px 10px}
 .done .tick{width:72px;height:72px;border-radius:50%;background:var(--leaf);color:var(--pandan);font-size:2.2rem;display:flex;align-items:center;justify-content:center;margin:0 auto 16px}
 .receipt{background:var(--card);border:1.5px solid var(--line);border-radius:var(--r-lg);padding:16px;text-align:left;margin:20px 0}
@@ -250,7 +264,7 @@ const API_URL = 'https://script.google.com/macros/s/AKfycbxWXi3LDOOT-x1nIlx1usib
 const HARI = ['senin','selasa','rabu','kamis','jumat','sabtu','minggu'];
 const NAMA_HARI = ['Senin','Selasa','Rabu','Kamis','Jumat','Sabtu','Minggu'];
 // Nomor versi aplikasi: NAIKKAN setiap commit baru, supaya link di WhatsApp selalu memuat versi terbaru
-const APP_VERSION = 13;
+const APP_VERSION = 14;
 // Link yang dibagikan di WhatsApp: selalu alamat utama aplikasi
 const SHARE_URL = 'https://byru5.github.io/preorder-app';
 const shareUrl = () => SHARE_URL;
@@ -364,6 +378,9 @@ const allFresh = (ms=30000) => ALL && Date.now() - ALL.at < ms;
 const BLN = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
 const HARI_ID = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
 function labelPendek(iso){ if (!iso) return ''; const [y,m,d] = iso.split('-').map(Number); return HARI_ID[new Date(y, m-1, d).getDay()].slice(0,3) + ', ' + d + ' ' + BLN[m-1]; }
+// Stok tersisa: Infinity jika selalu tersedia
+const stokMenu = m => (m.stok_mode === 'jumlah' && m.stok !== '' && m.stok !== undefined && m.stok !== null) ? Number(m.stok) : Infinity;
+const stokVar = (m, v) => (m.stok_mode === 'jumlah' && v.stok !== '' && v.stok !== undefined && v.stok !== null) ? Number(v.stok) : Infinity;
 const poOf = s => (s && s.po) || { iso: '', label: preorderLabel(), custom: false };
 function labelTanggal(iso){ if (!iso) return ''; const [y,m,d] = iso.split('-').map(Number); const dt = new Date(y, m-1, d); return HARI_ID[dt.getDay()] + ', ' + d + ' ' + BLN[m-1]; }
 // Batas pesan berulang: "HH:MM|0,1,2" (0 = Senin ... 6 = Minggu). Format lama (tanggal-jam) tetap didukung.
@@ -428,7 +445,7 @@ function viewGate(){
     <form id="f">
       <label for="kode">Kode akses</label>
       <p class="hint" style="margin:-2px 0 8px">Masukkan kode akses yang dibagikan pengelola untuk mulai memesan.</p>
-      ${pwField('<input id="kode" class="code-input" type="password" inputmode="text" autocomplete="off" required>')}
+      ${pwField('<input id="kode" class="code-input" type="password" inputmode="numeric" pattern="[0-9]*" autocomplete="off" required>')}
       <div class="err" id="e"></div>
       <button class="btn" style="width:100%;margin-top:6px" id="b">Masuk</button>
     </form>
@@ -438,6 +455,8 @@ function viewGate(){
     </div>
   </main>`;
   bindPw(app); $('#kode').focus();
+  // Kode akses hanya angka: buang karakter selain angka saat diketik/ditempel
+  $('#kode').addEventListener('input', e => { const v = e.target.value.replace(/\D/g, ''); if (v !== e.target.value) e.target.value = v; });
   $('#f').onsubmit = async e => {
     e.preventDefault();
     const kode = $('#kode').value.trim(); const b = $('#b');
@@ -540,9 +559,10 @@ function renderStore(data){
     <section class="menus" id="menus">
       ${menus.length ? menus.map(m => {
         const vs = m.varian || [];
-        const avail = m.tersedia && (!vs.length || vs.some(v => !v.habis));
-        const step = (vid, label) => `
-              <span class="stepper" data-id="${esc(m.id)}" data-v="${esc(vid)}">
+        const avail = m.tersedia && (vs.length ? vs.some(v => !v.habis && stokVar(m,v) > 0) : stokMenu(m) > 0);
+        const sisa = n => (n !== Infinity && n > 0) ? `<span class="sisa">Sisa ${n}</span>` : '';
+        const step = (vid, label, max) => `
+              <span class="stepper" data-id="${esc(m.id)}" data-v="${esc(vid)}" data-max="${max === Infinity ? '' : max}">
                 <button type="button" class="minus" aria-label="Kurangi ${esc(label)}"><svg viewBox="0 0 14 14" aria-hidden="true"><path d="M2 7h10"/></svg></button>
                 <span aria-live="polite">0</span>
                 <button type="button" class="plus" aria-label="Tambah ${esc(label)}"><svg viewBox="0 0 14 14" aria-hidden="true"><path d="M2 7h10M7 2v10"/></svg></button>
@@ -556,14 +576,14 @@ function renderStore(data){
             ${vs.length ? `
             <div class="row" style="padding-top:2px"><span class="price">${vs.length>1?'mulai ':''}${rp(Math.min(...vs.map(v=>v.harga)))}</span>${!avail?'<span class="pill closed">Habis</span>':''}</div>
             <div class="vlist">${vs.map(v => `
-              <div class="vrow ${v.habis||!m.tersedia?'off':''}">
-                <span><span class="vn">${esc(v.nama)}</span><br><span class="vp">${rp(v.harga)}</span></span>
-                ${v.habis||!m.tersedia ? '<span class="pill closed">Habis</span>' : canOrder ? step(v.id, m.nama+' '+v.nama) : ''}
+              <div class="vrow ${v.habis||!m.tersedia||stokVar(m,v)<=0?'off':''}">
+                <span><span class="vn">${esc(v.nama)}</span>${sisa(stokVar(m,v))}<br><span class="vp">${rp(v.harga)}</span></span>
+                ${v.habis||!m.tersedia||stokVar(m,v)<=0 ? '<span class="pill closed">Habis</span>' : canOrder ? step(v.id, m.nama+' '+v.nama, stokVar(m,v)) : ''}
               </div>`).join('')}
             </div>` : `
             <div class="row">
-              <span class="price">${rp(m.harga)}</span>
-              ${!m.tersedia ? '<span class="pill closed">Habis</span>' : canOrder ? step('', m.nama) : ''}
+              <span class="price">${rp(m.harga)}${sisa(stokMenu(m))}</span>
+              ${!m.tersedia || stokMenu(m) <= 0 ? '<span class="pill closed">Habis</span>' : canOrder ? step('', m.nama, stokMenu(m)) : ''}
             </div>`}
           </div>
         </article>`; }).join('') : `<div class="empty">Toko ini belum punya menu.</div>`}
@@ -599,7 +619,11 @@ function renderStore(data){
   };
   document.querySelectorAll('.stepper').forEach(st => {
     const id = st.dataset.id + '|' + (st.dataset.v || ''), out = st.querySelector('span');
-    st.querySelector('.plus').onclick = () => { qty[id] = (qty[id]||0) + 1; out.textContent = qty[id]; update(); };
+    const max = st.dataset.max === '' ? Infinity : Number(st.dataset.max);
+    st.querySelector('.plus').onclick = () => {
+      if ((qty[id]||0) >= max) { toast(`Stok tersisa ${max}`); return; }
+      qty[id] = (qty[id]||0) + 1; out.textContent = qty[id]; update();
+    };
     st.querySelector('.minus').onclick = () => { qty[id] = Math.max(0,(qty[id]||0) - 1); out.textContent = qty[id]; update(); };
   });
   $('#send').onclick = () => {
@@ -644,7 +668,7 @@ function renderStore(data){
         store.set('po_nama', nama);
         if (res.preorder && ALL) { ALL.po = res.preorder; }
         markOrdered(s.id); refreshAll().catch(()=>{});
-        close(); viewDone(s, res, nama);
+        close(); viewDone(s, res, nama, catatan);
       } catch(err){
         sending = false; b.disabled = false; $('#rc-back', box).disabled = false; b.textContent = 'Kirim'; $('#rc-e', box).textContent = err.message;
       }
@@ -669,11 +693,14 @@ function showPhoto(m){
   box.querySelector('.close').focus();
 }
 
-function waMessage(storeName, nama, po){
+function waMessage(storeName, nama, po, items, catatan){
   const open = (ALL ? ALL.stores : []).filter(x => x.buka);
   const url = shareUrl();
   po = po || { label: preorderLabel(), custom: false };
-  const parts = [`🍱 *Pre-Order (${po.label})*`, `${nama} sudah pesan di ${storeName} ✅`, '', 'Toko yang menerima pesanan hari ini:'];
+  const parts = [`🍱 *Pre-Order (${po.label})*`, `${nama} sudah pesan di ${storeName} ✅`];
+  (items || []).forEach(i => parts.push(`• ${i.qty}x ${i.nama}`));
+  if (catatan && String(catatan).trim()) parts.push(`📝 _${String(catatan).trim()}_`);
+  parts.push('', 'Toko yang menerima pesanan hari ini:');
   open.forEach((t, i) => {
     parts.push(`${i+1}. *${t.nama}*${t.tutup_label ? ` s/d _${t.tutup_label}_` : ''}`);
     if (t.deskripsi) parts.push(`_${t.deskripsi}_`);
@@ -683,7 +710,7 @@ function waMessage(storeName, nama, po){
   return parts.join('\n');
 }
 
-function viewDone(s, res, nama){
+function viewDone(s, res, nama, catatan){
   window.scrollTo(0,0);
   const poObj = res.preorder || poOf(s); const po = poObj.label;
   app.innerHTML = `
@@ -700,17 +727,19 @@ function viewDone(s, res, nama){
         ${res.items.map(i=>`<div class="line"><span>${i.qty}× ${esc(i.nama)}</span><span>${rp(i.qty*i.harga)}</span></div>`).join('')}
         <div class="line tot"><span>Total</span><span>${rp(res.total)}</span></div>
       </div>
-      <button class="btn wa" id="wa">Bagikan ke grup WhatsApp</button>
-      <p class="share-note">Kabari teman-teman di grup supaya mereka ikut pesan. Pilih grupnya setelah WhatsApp terbuka.</p>
+      <div class="share-note" role="note"><span class="ic" aria-hidden="true">💬</span><span><b>Kabari teman-teman di grup supaya mereka ikut pesan.</b>Pilih grupnya setelah WhatsApp terbuka.</span></div>
+      <button class="btn wa" id="wa" style="margin-bottom:10px">Bagikan ke grup WhatsApp</button>
       <button class="btn ghost" id="copy" style="width:100%;margin-bottom:10px">Salin pesan</button>
       <button class="link" onclick="location.hash==='#/'?route():go('/')">Kembali ke daftar toko</button>
     </section>
   </div>`;
-  const msg = () => waMessage(s.nama, nama, poObj);
-  $('#wa').onclick = () => { window.open('https://wa.me/?text=' + encodeURIComponent(msg()), '_blank'); };
+  const msg = () => waMessage(s.nama, nama, poObj, res.items, catatan);
+  // Bagikan: langsung buka WhatsApp dengan pesan terisi. Salin: langsung menyalin pesan.
+  $('#wa').onclick = () => window.open('https://wa.me/?text=' + encodeURIComponent(msg()), '_blank');
   $('#copy').onclick = async () => {
-    try { await navigator.clipboard.writeText(msg()); toast('Pesan disalin. Tempel di grup WhatsApp.'); }
-    catch(e){ prompt('Salin pesan ini:', msg()); }
+    const t = msg();
+    try { await navigator.clipboard.writeText(t); toast('Pesan disalin. Tempel di grup WhatsApp.'); }
+    catch(e){ prompt('Salin pesan ini:', t); }
   };
 }
 
@@ -812,7 +841,7 @@ function renderAdmin(){
       <div class="aitem">
         <div class="th">${m.foto_url?`<img src="${esc(thumb(m.foto_url,120))}" alt="">`:'🍽️'}</div>
         <div class="grow"><h4>${esc(m.nama)}</h4>
-          <div class="meta">${esc(storeName(m.id_toko))} · ${(m.varian||[]).length?`${m.varian.length} varian, mulai ${rp(Math.min(...m.varian.map(v=>v.harga)))}`:rp(m.harga)}${m.tersedia==='FALSE'?' · <b style="color:var(--sambal)">Habis</b>':''}</div></div>
+          <div class="meta">${esc(storeName(m.id_toko))} · ${(m.varian||[]).length?`${m.varian.length} varian, mulai ${rp(Math.min(...m.varian.map(v=>v.harga)))}`:rp(m.harga)}${m.stok_mode==='jumlah' ? ' · Stok ' + ((m.varian||[]).length ? m.varian.map(v=>`${esc(v.nama)} ${v.stok===''||v.stok===undefined?'∞':v.stok}`).join(', ') : (m.stok===''||m.stok===undefined?'∞':m.stok)) : ''}${m.tersedia==='FALSE'?' · <b style="color:var(--sambal)">Habis</b>':''}</div></div>
         <div class="acts"><button class="btn small ghost" onclick="editMenu('${esc(m.id)}')">Ubah</button></div>
       </div>`).join('') : `<div class="empty">${A.stores.length?'Belum ada menu. Tambahkan menu untuk toko Anda.':'Tambahkan toko dulu sebelum menambah menu.'}</div>`}</div>`;
     $('#ft').onchange = e => { A.filterToko = e.target.value; renderAdmin(); };
@@ -1123,8 +1152,18 @@ function editMenu(id){
       <select id="m_toko" class="${A.owner?'hidden':''}">${A.stores.map(s=>`<option value="${esc(s.id)}" ${m.id_toko===s.id?'selected':''}>${esc(s.nama)}</option>`).join('')}</select>
       <label for="m_nama">Nama menu</label><input id="m_nama" type="text" required value="${esc(m.nama||'')}">
       <div id="m_harga_wrap"><label for="m_harga">Harga (Rp)</label><input id="m_harga" type="number" min="0" step="500" value="${esc(m.harga??'')}"></div>
+      <label>Stok</label>
+      <div class="chips mode-chips" role="radiogroup" aria-label="Pengaturan stok">
+        <button type="button" class="chip ${m.stok_mode==='jumlah'?'':'on'}" data-s="selalu" role="radio">Selalu tersedia<small>Tanpa batas jumlah</small></button>
+        <button type="button" class="chip ${m.stok_mode==='jumlah'?'on':''}" data-s="jumlah" role="radio">Atur jumlah<small>Berkurang tiap pesanan</small></button>
+      </div>
+      <div id="m_stok_wrap" class="${m.stok_mode==='jumlah'?'':'hidden'}" style="margin-top:8px">
+        <input id="m_stok" type="number" min="0" step="1" inputmode="numeric" value="${esc(m.stok??'')}" placeholder="Jumlah stok" aria-label="Jumlah stok">
+      </div>
+      <p class="hint" id="m_stok_hint"></p>
       <label>Varian <span style="font-weight:400;color:var(--muted)">(opsional, misalnya ukuran atau panas/dingin)</span></label>
-      <div id="m_vars"></div>
+      <div id="m_vhead" class="vhead hidden"><span>Nama varian</span><span>Harga (Rp)</span><span class="vs">Stok</span></div>
+      <div id="m_vars" class="${m.stok_mode==='jumlah'?'':'stok-off'}"></div>
       <button type="button" class="btn small ghost" id="m_addv" style="margin-top:10px">Tambah varian</button>
       <p class="hint">Jika ada varian, setiap varian memakai harganya sendiri dan isian Harga di atas tidak dipakai.</p>
       <label for="m_desk">Deskripsi</label><textarea id="m_desk" placeholder="Contoh: Nasi, ayam goreng, sambal, lalapan">${esc(m.deskripsi||'')}</textarea>
@@ -1144,11 +1183,24 @@ function editMenu(id){
   $('#m_file', d).onchange = e => uploadFrom(e.target, $('#m_prev', d), $('#m_foto', d));
   $('#m_cancel', d).onclick = () => d.remove();
   const vbox = $('#m_vars', d);
-  const syncHarga = () => { $('#m_harga_wrap', d).style.display = vbox.children.length ? 'none' : ''; };
+  let stokMode = m.stok_mode === 'jumlah' ? 'jumlah' : 'selalu';
+  const syncStok = () => {
+    const ada = vbox.children.length > 0;
+    $('#m_stok_wrap', d).classList.toggle('hidden', stokMode !== 'jumlah' || ada);
+    vbox.classList.toggle('stok-off', stokMode !== 'jumlah');
+    $('#m_vhead', d).classList.toggle('hidden', !ada); $('#m_vhead', d).classList.toggle('stok-off', stokMode !== 'jumlah');
+    $('#m_stok_hint', d).textContent = stokMode !== 'jumlah' ? 'Menu selalu bisa dipesan berapa pun jumlahnya.'
+      : ada ? 'Isi stok di setiap varian. Kosongkan stok varian jika varian itu selalu tersedia.' : 'Stok otomatis berkurang setiap ada pesanan. Saat 0, menu tampil Habis.';
+  };
+  d.querySelectorAll('[data-s]').forEach(b => b.onclick = () => {
+    stokMode = b.dataset.s; d.querySelectorAll('[data-s]').forEach(x => x.classList.toggle('on', x === b)); syncStok();
+  });
+  const syncHarga = () => { $('#m_harga_wrap', d).style.display = vbox.children.length ? 'none' : ''; syncStok(); };
   const addVar = (v={}) => {
     const row = document.createElement('div'); row.className = 'vedit'; row.dataset.id = v.id || '';
     row.innerHTML = `<input type="text" class="vn" placeholder="Nama varian, mis. Dingin" value="${esc(v.nama||'')}" aria-label="Nama varian">
-      <input type="number" class="vh" min="0" step="500" placeholder="Harga" value="${esc(v.harga??'')}" aria-label="Harga varian">
+      <label class="vf"><small>Harga (Rp)</small><input type="number" class="vh" min="0" step="500" placeholder="Harga" value="${esc(v.harga??'')}" aria-label="Harga varian"></label>
+      <label class="vf vs"><small>Stok</small><input type="number" class="vs" min="0" step="1" inputmode="numeric" placeholder="Stok" value="${esc(v.stok??'')}" aria-label="Stok varian"></label>
       <label class="check"><input type="checkbox" class="vx" ${v.habis?'checked':''}> Habis</label>
       <button type="button" class="x" aria-label="Hapus varian">×</button>`;
     row.querySelector('.x').onclick = () => { row.remove(); syncHarga(); };
@@ -1163,11 +1215,13 @@ function editMenu(id){
   };
   $('#mf', d).onsubmit = async e => {
     e.preventDefault();
-    const varian = [...vbox.querySelectorAll('.vedit')].map(r => ({ id: r.dataset.id, nama: r.querySelector('.vn').value.trim(), harga: r.querySelector('.vh').value, habis: r.querySelector('.vx').checked }));
+    const varian = [...vbox.querySelectorAll('.vedit')].map(r => ({ id: r.dataset.id, nama: r.querySelector('.vn').value.trim(), harga: r.querySelector('.vh').value, habis: r.querySelector('.vx').checked, stok: stokMode === 'jumlah' ? r.querySelector('input.vs').value : '' }));
+    if (stokMode === 'jumlah' && !varian.length && $('#m_stok',d).value === ''){ $('#me',d).textContent = 'Isi jumlah stok, atau pilih "Selalu tersedia".'; return; }
     if (varian.some(v => !v.nama || v.harga === '')){ $('#me',d).textContent = 'Lengkapi nama dan harga setiap varian, atau hapus baris yang kosong.'; return; }
     if (!varian.length && $('#m_harga',d).value === ''){ $('#me',d).textContent = 'Isi harga menu, atau tambahkan varian beserta harganya.'; return; }
     const o = { id: id||'', id_toko: $('#m_toko',d).value, nama: $('#m_nama',d).value.trim(), harga: $('#m_harga',d).value,
-      deskripsi: $('#m_desk',d).value.trim(), foto_url: $('#m_foto',d).value, urutan: $('#m_urut',d).value, tersedia: $('#m_ada',d).checked ? 'TRUE':'FALSE', varian };
+      deskripsi: $('#m_desk',d).value.trim(), foto_url: $('#m_foto',d).value, urutan: $('#m_urut',d).value, tersedia: $('#m_ada',d).checked ? 'TRUE':'FALSE', varian,
+      stok_mode: stokMode, stok: stokMode === 'jumlah' && !varian.length ? $('#m_stok',d).value : '' };
     const btn = $('#m_save', d); btn.disabled = true; btn.textContent = 'Menyimpan…';
     try {
       const r = await api(act('saveMenu'), { menu:o }); d.remove(); bersihkanCachePembeli(); toast('Menu disimpan');
