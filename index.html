@@ -157,6 +157,92 @@ input:focus,select:focus,textarea:focus{border-color:var(--pandan);outline:none}
 .kbadge button:hover{background:var(--leaf)}
 .kbadge svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;pointer-events:none}
 .badge-row{display:grid;grid-template-columns:110px 1fr;gap:8px}
+.tl{margin:30px -18px 0;background:#fff;border-top:1px solid #EFF3F4;border-bottom:1px solid #EFF3F4}
+@media(min-width:720px){.tl{margin:30px 0 0;border:1px solid #EFF3F4;border-radius:var(--r-lg);overflow:hidden}}
+.tl .tl-hd{padding:14px 16px 10px;border-bottom:1px solid #EFF3F4}
+.tl h2{font-size:1.15rem;margin:0;font-weight:800;letter-spacing:-.01em;color:#0F1419}
+.tl .sub{color:#536471;font-size:.85rem;margin:2px 0 0}
+.tl ul{list-style:none;margin:0;padding:0}
+.post{display:flex;gap:10px;padding:12px 16px;border-bottom:1px solid #EFF3F4;color:#0F1419}
+.post:last-child{border-bottom:0}
+.av{width:40px;height:40px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:1rem;text-transform:uppercase}
+.post .bd{flex:1;min-width:0}
+.post .top{display:flex;gap:4px;align-items:baseline;flex-wrap:wrap;font-size:.92rem;line-height:1.3}
+.post .top b{font-weight:800}
+.post .top .h,.post .top .t{color:#536471}
+.post .top button{border:0;background:none;padding:0;color:#536471;font:inherit}
+.post .top button:hover{text-decoration:underline}
+.post .txt{font-size:1.1rem;line-height:1.45;margin:3px 0 6px;white-space:pre-wrap;word-wrap:break-word}
+.post .txt.clamp{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;line-clamp:2;overflow:hidden;margin-bottom:2px}
+.post .sel{display:block;border:0;background:none;padding:0;margin:0 0 8px;font-size:.95rem;font-weight:600;color:#1D9BF0}
+.post .sel:hover{text-decoration:underline}
+.post .order{display:inline-flex;gap:6px;align-items:center;font-size:.82rem;color:#536471;border:1px solid #EFF3F4;border-radius:999px;padding:3px 10px;margin:2px 0 6px;max-width:100%}
+.post .with{display:inline-flex;align-items:center;gap:6px;border:0;background:none;padding:2px 0;font-size:.84rem;font-weight:600;color:#1D9BF0;text-align:left}
+.post .with .stk{display:inline-flex;flex:none;align-items:center}
+.post .with .stk .av{width:22px;height:22px;font-size:.62rem;border:2px solid #fff;margin-left:-8px;box-sizing:border-box}
+.post .with .stk .av:first-child{margin-left:0}
+.post .with.first{color:#8A5A00}
+.post .with:hover{text-decoration:underline}
+.post.rek .av{background:var(--pandan);font-size:1.15rem}
+.post .badge{display:inline-block;font-size:.7rem;font-weight:700;color:#536471;border:1px solid #CFD9DE;border-radius:4px;padding:0 5px}
+.qs{border:1px solid #CFD9DE;border-radius:14px;overflow:hidden;margin:4px 0 6px}
+.qr{display:flex;align-items:center;gap:10px;padding:9px 12px;border-bottom:1px solid #EFF3F4;background:#fff}
+.qr:last-child{border-bottom:0}
+.qr .ic{width:34px;height:34px;border-radius:50%;background:var(--leaf);display:flex;align-items:center;justify-content:center;font-size:1rem;flex:none;overflow:hidden}
+.qr .ic img{width:100%;height:100%;object-fit:cover}
+.qr .n{flex:1;min-width:0}
+.qr b{font-size:.92rem;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.qr .s{font-size:.76rem;color:#536471}
+.qr .s.first{color:#A16207;font-weight:700}
+.qr .go{border:1px solid #CFD9DE;background:#fff;color:#0F1419;font-weight:700;font-size:.8rem;border-radius:999px;padding:5px 13px;flex:none}
+.qr .go:hover{background:#F7F9F9}
+.rek .lk{border:0;background:none;padding:2px 0;font-size:.86rem;font-weight:600;color:var(--pandan)}
+.rek .lk:hover{text-decoration:underline}
+.qs.sheet-list{border:0;border-radius:0;margin:8px 0 0;max-height:60vh;overflow:auto}
+.tl .more{display:block;width:100%;border:0;border-top:1px solid #EFF3F4;background:#fff;color:var(--pandan);font-weight:700;padding:12px}
+.plist{list-style:none;margin:10px 0 0;padding:0;max-height:55vh;overflow:auto}
+.plist li{display:flex;gap:10px;align-items:center;padding:9px 0;border-bottom:1px solid #EFF3F4}
+.plist .av{width:34px;height:34px;font-size:.85rem}
+.plist .nm{flex:1;min-width:0}
+.plist .nm b{font-size:.95rem}
+.plist .m{font-size:.84rem;color:#536471}
+.plist .ago{color:#536471;font-size:.8rem;flex:none}
+.plist li.me{background:#F1F7EE;border-radius:12px;padding:10px;border-bottom:0;margin-bottom:6px}
+.plist .me-tag{font-size:.72rem;font-weight:700;color:var(--pandan);background:#fff;border:1px solid #CFE3C6;border-radius:999px;padding:0 7px;margin-left:4px}
+.plist .cat{font-size:.82rem;color:#6B4600;margin-top:2px}
+.plist-sub{font-size:.8rem;font-weight:700;color:#536471;margin:8px 0 0}
+.pl-tutup{background:#F2F2F2;color:#555;border-radius:var(--r-sm);padding:9px 12px;font-size:.88rem;font-weight:600;margin-top:12px}
+.kata-wrap{margin-top:4px}
+.kata-wrap label{margin:6px 0 4px}
+.kata-wrap textarea{min-height:64px}
+.kata-meta{display:flex;justify-content:space-between;gap:8px;color:var(--muted);font-size:.8rem;margin-top:3px}
+.kata-box{position:relative}
+.kata-box textarea{padding-right:46px;max-height:168px;overflow-y:auto;resize:none}
+.gif-btn{position:absolute;right:6px;bottom:8px;width:34px;height:34px;border:0;border-radius:10px;background:none;color:#8B958E;display:flex;align-items:center;justify-content:center;padding:0}
+.gif-btn:hover{background:#F2F4F1}
+.gif-btn.on{color:var(--pandan)}
+.gif-btn svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;pointer-events:none}
+.gif-prev{position:relative;display:inline-block;margin-top:8px;max-width:220px}
+.gif-prev img{display:block;max-width:100%;max-height:180px;border-radius:12px}
+.gif-prev button{position:absolute;top:6px;right:6px;width:26px;height:26px;border-radius:50%;border:0;background:rgba(15,20,25,.75);color:#fff;font-size:.95rem;line-height:1;padding:0}
+.post .gif,.order .gif-a{position:relative;display:inline-block;margin:2px 0 8px;max-width:min(100%,320px)}
+.post .gif img{display:block;max-width:100%;max-height:280px;border-radius:16px;border:1px solid #EFF3F4}
+.post .gif span,.order .gif-a span,.gif-prev span{position:absolute;left:8px;bottom:8px;background:rgba(15,20,25,.75);color:#fff;font-size:.66rem;font-weight:800;border-radius:4px;padding:1px 5px;letter-spacing:.04em}
+.order .gif-a{display:block;margin:6px 0 0;max-width:160px}
+.order .gif-a img{display:block;max-width:100%;max-height:120px;border-radius:10px}
+.sheet.gif-sheet{z-index:30}
+.gif-cari{position:relative;margin:6px 0 8px}
+.gif-cari input{width:100%}
+.gif-chips{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;margin-bottom:8px}
+.gif-chips button{flex:none;border:1.5px solid var(--line);background:#fff;border-radius:999px;padding:5px 12px;font-size:.84rem;font-weight:600;color:var(--ink)}
+.gif-chips button.on{background:var(--pandan);border-color:var(--pandan);color:#fff}
+.gif-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;min-height:180px;max-height:52vh;overflow:auto;align-content:start}
+.gif-grid button{border:0;padding:0;background:#EEF1ED;border-radius:10px;overflow:hidden;display:block;width:100%}
+.gif-grid img{display:block;width:100%;height:auto}
+.gif-grid .msg{grid-column:1/-1;text-align:center;color:var(--muted);padding:30px 10px;font-size:.9rem}
+.gif-by{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:10px;font-size:.78rem;color:var(--muted)}
+.gif-by b{color:#0F1419;font-weight:800;letter-spacing:.02em}
+.kata-tag{display:inline-block;font-size:.72rem;font-weight:700;background:#FFF8EA;color:#8A5A00;border-radius:999px;padding:1px 8px;margin-left:6px}
 .po-day{display:flex;align-items:center;gap:8px;background:var(--pandan);color:#fff;border-radius:var(--r-sm);padding:10px 14px;margin:14px 0 4px;font-size:.95rem}
 .recap{position:fixed;inset:0;z-index:25;background:rgba(15,22,17,.55);display:flex;align-items:flex-end;justify-content:center}
 .recap .box{background:var(--paper);width:100%;max-width:560px;max-height:90vh;overflow:auto;border-radius:22px 22px 0 0;padding:20px 18px calc(20px + env(safe-area-inset-bottom,0px))}
@@ -264,7 +350,22 @@ const API_URL = 'https://script.google.com/macros/s/AKfycbxWXi3LDOOT-x1nIlx1usib
 const HARI = ['senin','selasa','rabu','kamis','jumat','sabtu','minggu'];
 const NAMA_HARI = ['Senin','Selasa','Rabu','Kamis','Jumat','Sabtu','Minggu'];
 // Nomor versi aplikasi: NAIKKAN setiap commit baru, supaya link di WhatsApp selalu memuat versi terbaru
-const APP_VERSION = 14;
+const APP_VERSION = 15;
+// GIF dari GIPHY (Tahap 3). Isi dengan API key dari developers.giphy.com; jika kosong, tombol GIF tidak tampil.
+const GIPHY_KEY = '';
+const GIF_RE = /^https:\/\/(media\d*|i)\.giphy\.com\/[A-Za-z0-9\/_.\-]+\.(gif|webp)$/;
+const gifAktif = () => !!(window.DEMO_GIF || GIPHY_KEY);
+const gifAman = u => !!u && (GIF_RE.test(u) || (!!window.DEMO_GIF && /^data:image\/gif;base64,/.test(u)));
+async function cariGif(q){
+  if (window.DEMO_GIF) return window.DEMO_GIF(q); // hanya di mode preview
+  const ep = q ? 'search' : 'trending';
+  const u = `https://api.giphy.com/v1/gifs/${ep}?api_key=${encodeURIComponent(GIPHY_KEY)}&limit=24&rating=g&lang=id${q ? '&q=' + encodeURIComponent(q) : ''}`;
+  const r = await fetch(u); if (!r.ok) throw new Error('GIPHY ' + r.status);
+  const d = await r.json();
+  return (d.data || []).map(g => { const im = g.images || {}, b = im.fixed_width || {}, k = im.fixed_width_small || b;
+    return { id: g.id, kecil: k.url, url: String(b.url || '').split('?')[0], w: +b.width || 200, h: +b.height || 150 }; })
+    .filter(g => GIF_RE.test(g.url));
+}
 // Link yang dibagikan di WhatsApp: selalu alamat utama aplikasi
 const SHARE_URL = 'https://byru5.github.io/preorder-app';
 const shareUrl = () => SHARE_URL;
@@ -370,7 +471,7 @@ function saveAll(){ try { localStorage.setItem('po_all', JSON.stringify(ALL)); }
 function refreshAll(){
   if (allPromise) return allPromise;
   allPromise = api('getAll').then(d => {
-    ALL = { stores: d.stores, menus: d.menus, po: d.preorder || null, at: Date.now() }; saveAll(); preloadPhotos(); return ALL;
+    ALL = { stores: d.stores, menus: d.menus, po: d.preorder || null, feed: d.feed || [], at: Date.now() }; saveAll(); preloadPhotos(); return ALL;
   }).finally(() => { allPromise = null; });
   return allPromise;
 }
@@ -468,6 +569,156 @@ function viewGate(){
 function logout(){ store.del('po_kode'); try{ localStorage.removeItem('po_all'); }catch(e){} ALL = null; go('/'); route(); }
 
 /* ===== Home ===== */
+/* ===== Timeline "Baru saja memesan" ===== */
+function waktuLalu(iso){
+  if (!iso) return '';
+  const t = new Date(String(iso).slice(0,19) + '+07:00'); if (isNaN(t)) return '';
+  const m = Math.max(0, Math.round((Date.now() - t.getTime()) / 60000));
+  if (m < 1) return 'baru';
+  if (m < 60) return m + 'm';
+  const j = Math.floor(m / 60); if (j < 24) return j + 'j';
+  return Math.floor(j / 24) + 'h';
+}
+const menuRingkas = items => (items || []).map(i => `${i.qty}x ${i.nama}`).join(', ');
+const WARNA_AV = ['#7C3AED','#0EA5E9','#F59E0B','#DB2777','#059669','#EA580C','#2563EB','#9333EA','#0D9488','#DC2626'];
+function warnaNama(n){ let h = 0; for (const c of String(n)) h = (h * 31 + c.charCodeAt(0)) >>> 0; return WARNA_AV[h % WARNA_AV.length]; }
+const avatar = n => `<span class="av" style="background:${warnaNama(n)}" aria-hidden="true">${esc(String(n).trim().charAt(0) || '?')}</span>`;
+// Pemesan di warung yang sama yang memesan SEBELUM postingan ini (feed urut terbaru di atas)
+function pemesanSebelum(f){
+  const feed = (ALL && ALL.feed) || []; const i = feed.findIndex(x => x.id === f.id);
+  return feed.slice(i + 1).filter(x => x.id_toko === f.id_toko);
+}
+// "bersama X, Y, dan N lainnya" (nama depan, hanya pemesan sebelumnya). Kosong = pemesan pertama.
+function teksBersama(seb){
+  if (!seb.length) return '';
+  const nama = [...new Set(seb.map(x => x.nama))].slice(0, 2);
+  const sisa = seb.length - nama.length;
+  return `bersama ${nama.join(nama.length > 1 && sisa <= 0 ? ' dan ' : ', ')}${sisa > 0 ? `, dan ${sisa} lainnya` : ''}`;
+}
+// Baris "bersama" untuk pesan WhatsApp setelah memesan. Jika feed belum memuat pesanan ini, semua pesanan di feed dianggap sebelumnya.
+function barisBersamaWA(idToko, idPesanan){
+  const feed = (ALL && ALL.feed) || []; const i = feed.findIndex(x => x.id === idPesanan);
+  const seb = (i >= 0 ? feed.slice(i + 1) : feed).filter(x => x.id_toko === idToko && x.id !== idPesanan);
+  return seb.length ? `👥 _${teksBersama(seb)}_` : '🎉 _Pemesan pertama di warung ini_';
+}
+/* --- Rekomendasi warung lain (muncul setelah 4 pesanan berturut-turut di warung yang sama) --- */
+const KALIMAT_REK = [
+  'Lagi cari yang beda? Menu-menu ini siap menemani harimu:',
+  'Ganti suasana makan, yuk! Pilihan lain yang tak kalah enak:',
+  'Coba yang belum pernah kamu pesan. Siapa tahu jadi favorit baru:',
+  'Pilihan lain yang tak kalah lezat dan masih bisa dipesan sekarang:',
+  'Pesan di sini, lebih leluasa pilih menu. Stok masih lengkap:',
+  'Lagi pengin sesuatu yang lain? Cek rekomendasi hari ini:',
+  'Jadi yang pertama mencoba menu dari warung-warung ini:',
+  'Temukan rasa baru hari ini. Mereka sudah siap menerima pesananmu:',
+  'Rekomendasi buat kamu yang suka variasi menu:',
+  'Biar makan siangnya makin seru, coba juga yang ini:',
+  'Satu kali coba, siapa tahu ketagihan. Pilihan hari ini:',
+  'Masih ada pilihan menarik lainnya untuk Pre-Order hari ini:'
+];
+// Acak tapi stabil (tidak berubah saat timeline diperbarui tiap menit)
+function acakDari(kunci){ let h = 2166136261; for (const c of String(kunci)) h = Math.imul(h ^ c.charCodeAt(0), 16777619);
+  return () => { h += 0x6D2B79F5; let t = h; t = Math.imul(t ^ t >>> 15, t | 1); t ^= t + Math.imul(t ^ t >>> 7, t | 61); return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+function kandidatRek(kecuali){
+  const feed = (ALL && ALL.feed) || []; const jml = {};
+  feed.forEach(f => { jml[f.id_toko] = (jml[f.id_toko] || 0) + 1; });
+  return ((ALL && ALL.stores) || []).map((s, i) => ({ s, i, n: jml[s.id] || 0 }))
+    .filter(x => x.s.bisaPesan && x.s.id !== kecuali)
+    .sort((a, b) => a.n - b.n || a.i - b.i);
+}
+function pilihRek(kecuali, sudah, rnd){
+  const semua = kandidatRek(kecuali).filter(x => !sudah.has(x.s.id));
+  const nol = semua.filter(x => x.n === 0), lain = semua.filter(x => x.n > 0);
+  const kolam = nol.length >= 6 ? nol : nol.concat(lain.slice(0, Math.max(0, 6 - nol.length)));
+  const acak = kolam.slice().sort(() => 0).map(x => [rnd(), x]).sort((a, b) => a[0] - b[0]).map(x => x[1]);
+  return acak.sort((a, b) => (a.n === 0 ? 0 : 1) - (b.n === 0 ? 0 : 1)).slice(0, 3);
+}
+function barisRek(x){
+  const s = x.s, ic = s.foto_url ? `<img src="${esc(thumb(s.foto_url,120))}" alt="">` : '🍽';
+  const ket = (x.n === 0 ? 'Jadilah yang pertama!' : 'Siap dipesan') + (s.tutup_label ? ` · s/d ${s.tutup_label}` : '');
+  return `<div class="qr"><span class="ic" aria-hidden="true">${ic}</span><div class="n"><b>${esc(s.nama)}</b><div class="s ${x.n === 0 ? 'first' : ''}">${esc(ket)}</div></div><button type="button" class="go" data-go="${esc(s.id)}">Pesan</button></div>`;
+}
+function postRek(kecuali, sudah, kunci, kalimatDipakai){
+  const rnd = acakDari(kunci);
+  const pilih = pilihRek(kecuali, sudah, rnd); if (!pilih.length) return '';
+  pilih.forEach(x => sudah.add(x.s.id));
+  let k = Math.floor(rnd() * KALIMAT_REK.length), coba = 0;
+  while (kalimatDipakai.has(k) && coba++ < KALIMAT_REK.length) k = (k + 1) % KALIMAT_REK.length;
+  kalimatDipakai.add(k);
+  const sisa = kandidatRek(kecuali).length - pilih.length;
+  return `<li class="post rek"><span class="av" aria-hidden="true">🍱</span><div class="bd">
+    <div class="top"><b>Pre-Order F&amp;B</b> <span class="badge">Rekomendasi</span><span class="t">· sekarang</span></div>
+    <div class="txt">${esc(KALIMAT_REK[k])}</div>
+    <div class="qs">${pilih.map(barisRek).join('')}</div>
+    ${sisa > 0 ? `<button type="button" class="lk" data-semua="${esc(kecuali)}">Lihat ${sisa} pilihan lainnya ›</button>` : ''}
+  </div></li>`;
+}
+function semuaPilihan(kecuali){
+  const d = openSheet(`<h2>Pilihan lain hari ini</h2><p class="hint" style="margin:0">Semua warung yang masih menerima pesanan</p>
+    <div class="qs sheet-list">${kandidatRek(kecuali).map(barisRek).join('')}</div>
+    <div class="actions"><button type="button" class="btn small ghost" id="sp_close">Tutup</button></div>`);
+  $('#sp_close', d).onclick = () => d.remove();
+  d.querySelectorAll('[data-go]').forEach(b => b.onclick = () => { d.remove(); bukaToko(b.dataset.go); });
+}
+
+let tlBatas = 10;
+const tlBuka = new Set(); // kata-kata yang sudah dibuka lewat "Selengkapnya"
+function renderTimeline(){
+  const box = $('#tl'); if (!box) return;
+  const feed = (ALL && ALL.feed) || [];
+  const po = ALL && ALL.po && ALL.po.label ? ` · Pre-Order ${ALL.po.label}` : '';
+  if (!feed.length){ box.innerHTML = `<div class="tl-hd"><h2>Baru saja memesan</h2><p class="sub">Belum ada pesanan. Jadilah yang pertama! 🎉</p></div>`; return; }
+  box.innerHTML = `<div class="tl-hd"><h2>Baru saja memesan</h2><p class="sub">${feed.length} pesanan${esc(po)}</p></div>
+    <ul>${(() => { let runToko = '', runN = 0; const sudah = new Set(), kal = new Set();
+      return feed.slice(0, tlBatas).map(f => {
+      if (f.id_toko === runToko) runN++; else { runToko = f.id_toko; runN = 1; }
+      const sisipan = runN % 4 === 0 ? postRek(f.id_toko, sudah, f.id + '|' + (ALL.po && ALL.po.iso), kal) : '';
+      const seb = pemesanSebelum(f);
+      const stk = `<span class="stk">${[...new Set(seb.map(x => x.nama))].slice(0, 3).map(avatar).join('')}</span>`;
+      const teks = !seb.length ? '🎉 Pemesan pertama di warung ini' : `${stk}<span>${esc(teksBersama(seb))} ›</span>`;
+      return `<li class="post">${avatar(f.nama)}<div class="bd">
+        <div class="top"><b>${esc(f.nama)}</b><span class="h">·</span><button type="button" data-go="${esc(f.id_toko)}">${esc(f.nama_toko)}</button><span class="t">· ${esc(waktuLalu(f.waktu))}</span></div>
+        ${f.kata ? `<div class="txt${tlBuka.has(f.id) ? '' : ' clamp'}">${esc(f.kata)}</div>${tlBuka.has(f.id) ? '' : `<button type="button" class="sel" data-sel="${esc(f.id)}" hidden>Selengkapnya</button>`}` : ''}
+        ${gifAman(f.gif) ? `<div class="gif"><img src="${esc(f.gif)}" alt="GIF dari ${esc(f.nama)}" loading="lazy"><span>GIF</span></div><br>` : ''}
+        <div class="order">🍽 ${esc(menuRingkas(f.items))}</div><br>
+        ${seb.length ? `<button type="button" class="with" data-list="${esc(f.id)}">${teks}</button>` : `<span class="with first">${teks}</span>`}
+      </div></li>${sisipan}`; }).join(''); })()}</ul>
+    ${feed.length > tlBatas ? `<button type="button" class="more" id="tlMore">Tampilkan lebih banyak</button>` : ''}`;
+  box.querySelectorAll('[data-go]').forEach(b => b.onclick = () => bukaToko(b.dataset.go));
+  box.querySelectorAll('[data-list]').forEach(b => b.onclick = () => daftarSebelum(b.dataset.list));
+  box.querySelectorAll('[data-semua]').forEach(b => b.onclick = () => semuaPilihan(b.dataset.semua));
+  const more = $('#tlMore'); if (more) more.onclick = () => { tlBatas += 10; renderTimeline(); };
+  // "Selengkapnya" hanya muncul jika kata-kata benar-benar lebih dari 2 baris
+  box.querySelectorAll('[data-sel]').forEach(b => {
+    const t = b.previousElementSibling;
+    if (t.scrollHeight > t.clientHeight + 1) b.hidden = false; else { t.classList.remove('clamp'); b.remove(); }
+    b.onclick = () => { tlBuka.add(b.dataset.sel); t.classList.remove('clamp'); b.remove(); };
+  });
+}
+function bukaToko(id){
+  const st = ALL && ALL.stores.find(x => x.id === id);
+  if (st && st.bisaPesan) go('/toko/' + encodeURIComponent(id)); else toast('Toko ini sedang tidak menerima pesanan.');
+}
+function daftarSebelum(postId){
+  const f = ((ALL && ALL.feed) || []).find(x => x.id === postId); if (!f) return;
+  const list = pemesanSebelum(f); const st = ALL.stores.find(x => x.id === f.id_toko);
+  const nm = (st && st.nama) || f.nama_toko;
+  const tgl = st && st.po && st.po.label ? ' · ' + st.po.label : '';
+  const baris = (x, me) => `<li class="${me ? 'me' : ''}">${avatar(x.nama)}<div class="nm"><b>${esc(x.nama)}</b>${me ? '<span class="me-tag">Postingan ini</span>' : ''}
+    <div class="m">${esc(menuRingkas(x.items))}</div>${me && x.catatan ? `<div class="cat">📝 ${esc(x.catatan)}</div>` : ''}</div><span class="ago">${esc(waktuLalu(x.waktu))}</span></li>`;
+  const d = openSheet(`
+    <h2>Sebelum ${esc(f.nama)}, sudah ada ${list.length} orang</h2>
+    <p class="hint" style="margin:0">di ${esc(nm)}${esc(tgl)}</p>
+    <ul class="plist">${baris(f, true)}${list.length ? `<li class="plist-sub" style="border:0;padding:4px 0 0">Memesan sebelumnya</li>` : ''}${list.map(x => baris(x, false)).join('')}</ul>
+    ${st && st.bisaPesan ? '' : `<div class="pl-tutup">🔒 ${esc(nm)} sedang tidak menerima pesanan${st && st.info ? ` (${esc(st.info)})` : ''}, jadi belum bisa ikut pesan.</div>`}
+    <div class="actions">
+      <button type="button" class="btn small ghost" id="pl_close">Tutup</button>
+      ${st && st.bisaPesan ? `<button type="button" class="btn small" id="pl_go">Ikut pesan di sini</button>` : ''}
+    </div>`);
+  $('#pl_close', d).onclick = () => d.remove();
+  const g = $('#pl_go', d); if (g) g.onclick = () => { d.remove(); go('/toko/' + encodeURIComponent(f.id_toko)); };
+}
+
 async function viewHome(){
   app.innerHTML = `
   <div class="wrap">
@@ -477,7 +728,9 @@ async function viewHome(){
       <p>Toko di urutan atas sedang mendapat giliran. Setelah dipesan, toko pindah ke paling bawah.</p>
     </section>
     <ol class="queue" id="list"><li class="loading">Memuat daftar toko…</li></ol>
+    <section class="tl" id="tl" aria-live="polite"></section>
   </div>`;
+  tlBatas = 10;
   const render = stores => {
     const list = $('#list'); if (!list) return;
     if (!stores.length){ list.innerHTML = `<li class="empty">Belum ada toko. Admin bisa menambahkannya dari halaman admin.</li>`; return; }
@@ -498,9 +751,9 @@ async function viewHome(){
     }).join('');
     list.querySelectorAll('.store:not([disabled])').forEach(b => b.onclick = () => go('/toko/' + encodeURIComponent(b.dataset.id)));
   };
-  if (ALL) render(ALL.stores);
+  if (ALL) { render(ALL.stores); renderTimeline(); }
   const load = async () => {
-    try { await refreshAll(); render(ALL.stores); }
+    try { await refreshAll(); render(ALL.stores); renderTimeline(); }
     catch(err){
       if (err.message === 'Kode akses salah') return logout();
       if (!ALL){ const list = $('#list'); if (list) list.innerHTML = `<li class="empty">Daftar toko gagal dimuat: ${esc(err.message)}. Muat ulang halaman untuk mencoba lagi.</li>`; }
@@ -651,12 +904,27 @@ function renderStore(data){
         ${catatan ? `<div class="kv"><span>Catatan:</span> ${esc(catatan)}</div>` : ''}
         ${s.waktu_ambil ? `<div class="kv"><span>Ambil:</span> ${esc(fmtWaktu(s.waktu_ambil))}</div>` : ''}
       </div>
+      <div class="kata-wrap">
+        <label for="rc-kata">💬 Kata-kata hari ini <span style="font-weight:400;color:var(--muted)">(opsional)</span></label>
+        <div class="kata-box"><textarea id="rc-kata" maxlength="500" placeholder="${esc(['Lagi pengin apa hari ini?','Semangat buat hari ini!','Rekomendasi menu favoritmu?','Cerita singkat hari ini…'][Math.floor(Math.random()*4)])}"></textarea>
+          ${gifAktif() ? `<button type="button" class="gif-btn" id="rc-gifbtn" aria-label="Tambah GIF" title="Tambah GIF"><svg viewBox="0 0 24 24"><path d="M15.5 3H5a2 2 0 0 0-2 2v14c0 1.1.9 2 2 2h14a2 2 0 0 0 2-2V8.5L15.5 3Z"/><path d="M14 3v4a2 2 0 0 0 2 2h4"/><path d="M8 13h.01"/><path d="M16 13h.01"/><path d="M10 16s.8 1 2 1c1.3 0 2-1 2-1"/></svg></button>` : ''}</div>
+        <div id="rc-gif"></div>
+        <div class="kata-meta"><span>Tampil di timeline untuk semua orang.</span><span id="rc-count">0/500</span></div>
+      </div>
       <div class="err" id="rc-e"></div>
       <div class="actions">
         <button type="button" class="btn ghost" id="rc-back">Ubah</button>
         <button type="button" class="btn" id="rc-send">Kirim</button>
       </div></div>`;
     document.body.appendChild(box);
+    const kt = $('#rc-kata', box); kt.oninput = () => { $('#rc-count', box).textContent = kt.value.length + '/500'; kt.style.height = 'auto'; kt.style.height = Math.min(kt.scrollHeight + 2, 168) + 'px'; };
+    let gif = '';
+    const renderGif = () => {
+      const gb = $('#rc-gifbtn', box); if (gb){ gb.classList.toggle('on', !!gif); gb.setAttribute('aria-label', gif ? 'Ganti GIF' : 'Tambah GIF'); gb.title = gb.getAttribute('aria-label'); }
+      $('#rc-gif', box).innerHTML = gif ? `<div class="gif-prev"><img src="${esc(gif)}" alt="GIF pilihan"><span>GIF</span><button type="button" aria-label="Hapus GIF">✕</button></div>` : '';
+      const x = $('#rc-gif button', box); if (x) x.onclick = () => { gif = ''; renderGif(); };
+    };
+    const gb = $('#rc-gifbtn', box); if (gb) gb.onclick = () => pilihGif(u => { gif = u; renderGif(); });
     const close = () => box.remove();
     backdropClose(box, close, () => !sending);
     $('#rc-back', box).onclick = close;
@@ -664,7 +932,8 @@ function renderStore(data){
     $('#rc-send', box).onclick = async () => {
       const b = $('#rc-send', box); sending = true; b.disabled = true; $('#rc-back', box).disabled = true; b.textContent = 'Mengirim…'; $('#rc-e', box).textContent = '';
       try {
-        const res = await api('placeOrder', { id_toko: s.id, nama, catatan, items: lines.map(l => ({ id: l.id, varian_id: l.varian_id, qty: l.qty })) });
+        const kata = ($('#rc-kata', box).value || '').trim().slice(0, 500);
+        const res = await api('placeOrder', { id_toko: s.id, nama, catatan, kata, gif, items: lines.map(l => ({ id: l.id, varian_id: l.varian_id, qty: l.qty })) });
         store.set('po_nama', nama);
         if (res.preorder && ALL) { ALL.po = res.preorder; }
         markOrdered(s.id); refreshAll().catch(()=>{});
@@ -675,6 +944,34 @@ function renderStore(data){
     };
     $('#rc-send', box).focus();
   };
+}
+
+const GIF_CHIPS = ['Trending','gajian','lapar','makan','semangat','yummy'];
+function pilihGif(onPilih){
+  const d = openSheet(`<h2>Pilih GIF</h2>
+    <div class="gif-cari"><input type="text" inputmode="search" id="gf_q" placeholder="Cari GIF…" autocomplete="off" enterkeyhint="search"></div>
+    <div class="gif-chips">${GIF_CHIPS.map((c,i) => `<button type="button" data-q="${i ? esc(c) : ''}" class="${i ? '' : 'on'}">${esc(c)}</button>`).join('')}</div>
+    <div class="gif-grid" id="gf_grid"></div>
+    <div class="gif-by"><span>Powered by <b>GIPHY</b></span><button type="button" class="btn small ghost" id="gf_close">Tutup</button></div>`);
+  d.classList.add('gif-sheet');
+  const grid = $('#gf_grid', d), q = $('#gf_q', d);
+  let token = 0, t;
+  const muat = async kata => {
+    const my = ++token; grid.innerHTML = '<div class="msg">Memuat GIF…</div>';
+    try {
+      const list = await cariGif(kata);
+      if (my !== token) return;
+      grid.innerHTML = list.length ? list.map((g,i) => `<button type="button" data-i="${i}" aria-label="Pilih GIF"><img src="${esc(g.kecil)}" alt="" loading="lazy" style="aspect-ratio:${g.w}/${g.h}"></button>`).join('')
+        : `<div class="msg">Tidak ada GIF untuk “${esc(kata)}”.</div>`;
+      grid.querySelectorAll('[data-i]').forEach(b => b.onclick = () => { const g = list[+b.dataset.i]; if (!g || !gifAman(g.url)) return; d.remove(); onPilih(g.url); });
+    } catch(err){ if (my === token) grid.innerHTML = '<div class="msg">GIF gagal dimuat. Coba lagi.</div>'; }
+  };
+  const tandai = v => d.querySelectorAll('.gif-chips button').forEach(b => b.classList.toggle('on', b.dataset.q.toLowerCase() === v.toLowerCase()));
+  d.querySelectorAll('.gif-chips button').forEach(b => b.onclick = () => { q.value = b.dataset.q; tandai(b.dataset.q); muat(b.dataset.q); });
+  q.oninput = () => { clearTimeout(t); const v = q.value.trim(); tandai(v); t = setTimeout(() => muat(v), 400); };
+  q.onkeydown = e => { if (e.key === 'Enter'){ e.preventDefault(); clearTimeout(t); muat(q.value.trim()); } };
+  $('#gf_close', d).onclick = () => d.remove();
+  muat('');
 }
 
 function showPhoto(m){
@@ -693,13 +990,13 @@ function showPhoto(m){
   box.querySelector('.close').focus();
 }
 
-function waMessage(storeName, nama, po, items, catatan){
+function waMessage(storeName, nama, po, items, bersama){
   const open = (ALL ? ALL.stores : []).filter(x => x.buka);
   const url = shareUrl();
   po = po || { label: preorderLabel(), custom: false };
-  const parts = [`🍱 *Pre-Order (${po.label})*`, `${nama} sudah pesan di ${storeName} ✅`];
+  const parts = [`🍱 *Pre-Order (${po.label})*`, `*${nama}* sudah pesan di ${storeName} ✅`];
   (items || []).forEach(i => parts.push(`• ${i.qty}x ${i.nama}`));
-  if (catatan && String(catatan).trim()) parts.push(`📝 _${String(catatan).trim()}_`);
+  if (bersama) parts.push(bersama);
   parts.push('', 'Toko yang menerima pesanan hari ini:');
   open.forEach((t, i) => {
     parts.push(`${i+1}. *${t.nama}*${t.tutup_label ? ` s/d _${t.tutup_label}_` : ''}`);
@@ -733,7 +1030,7 @@ function viewDone(s, res, nama, catatan){
       <button class="link" onclick="location.hash==='#/'?route():go('/')">Kembali ke daftar toko</button>
     </section>
   </div>`;
-  const msg = () => waMessage(s.nama, nama, poObj, res.items, catatan);
+  const msg = () => waMessage(s.nama, nama, poObj, res.items, barisBersamaWA(s.id, res.id));
   // Bagikan: langsung buka WhatsApp dengan pesan terisi. Salin: langsung menyalin pesan.
   $('#wa').onclick = () => window.open('https://wa.me/?text=' + encodeURIComponent(msg()), '_blank');
   $('#copy').onclick = async () => {
@@ -871,6 +1168,9 @@ function renderAdmin(){
         <div class="meta" style="color:var(--muted);font-size:.85rem">${esc(o.nama_toko)} · ${esc(o.id)}</div>
         <div class="items">${esc(o.ringkasan)}</div>
         ${o.catatan?`<div class="note">${esc(o.catatan)}</div>`:''}
+        ${(o.kata_hari_ini||gifAman(o.gif))?`<div class="note" style="background:#FFF8EA;${o.kata_sembunyi==='TRUE'?'opacity:.55;':''}"><span style="${o.kata_sembunyi==='TRUE'?'text-decoration:line-through':''}">${o.kata_hari_ini?`💬 “${esc(o.kata_hari_ini)}”`:'💬 (tanpa kata-kata)'}</span>${o.kata_sembunyi==='TRUE'?'<span class="kata-tag">Disembunyikan</span>':''}
+          ${gifAman(o.gif)?`<span class="gif-a"><img src="${esc(o.gif)}" alt="GIF" loading="lazy"><span>GIF</span></span>`:''}
+          ${A.owner?'':`<button class="link" style="font-size:.82rem;margin-left:6px" onclick="toggleKata('${esc(o.id)}')">${o.kata_sembunyi==='TRUE'?'Tampilkan di timeline':'Sembunyikan dari timeline'}</button>`}</div>`:''}
         <div class="bottom"><b>${rp(o.total)}</b>
           <button class="btn small ${o.status==='Selesai'?'ghost':''}" onclick="toggleOrder('${esc(o.id)}')">${o.status==='Selesai'?'Tandai belum selesai':'Tandai selesai'}</button></div>
       </div>`).join('') : `<div class="empty">Belum ada pesanan untuk pre-order ${esc(labelTanggal(tg))}.</div>`}</div>`;
@@ -971,6 +1271,13 @@ function openRekap(){
   $('#rk_wa', d).onclick = () => window.open('https://wa.me/?text=' + encodeURIComponent($('#rk_text', d).textContent), '_blank');
 }
 
+async function toggleKata(id){
+  const o = A.orders.find(x=>x.id===id); if (!o) return;
+  const sembunyi = o.kata_sembunyi !== 'TRUE';
+  const prev = o.kata_sembunyi; o.kata_sembunyi = sembunyi ? 'TRUE' : ''; renderAdmin();
+  try { await api('setKataSembunyi', { id, sembunyi }); bersihkanCachePembeli(); const apa = (o.kata_hari_ini && gifAman(o.gif)) ? 'Kata-kata & GIF' : (gifAman(o.gif) ? 'GIF' : 'Kata-kata'); toast(sembunyi ? apa + ' disembunyikan dari timeline' : apa + ' ditampilkan lagi'); }
+  catch(err){ o.kata_sembunyi = prev; renderAdmin(); toast('Gagal menyimpan: ' + err.message); }
+}
 async function toggleOrder(id){
   const o = A.orders.find(x=>x.id===id); if (!o) return;
   const status = o.status === 'Selesai' ? 'Baru' : 'Selesai';
