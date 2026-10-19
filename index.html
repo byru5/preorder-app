@@ -1224,9 +1224,8 @@ function renderAdmin(){
     if (!A.filterTanggal) A.filterTanggal = todayWIB();
     const f = A.filterToko, tg = A.filterTanggal;
     const list = A.orders.filter(o => (!f || o.id_toko===f) && orderDate(o) === tg);
-    // Admin: riwayat lengkap semua tanggal pre-order lain. Pemilik toko: hanya pesanan yang dibuat hari ini (WIB).
-    const hariIni = todayWIB();
-    const hist = A.orders.filter(o => (!f || o.id_toko===f) && orderDate(o) !== tg && (!A.owner || String(o.waktu||'').slice(0,10) === hariIni))
+    // Riwayat pesanan hanya untuk admin; panel pemilik toko cukup menampilkan pesanan tanggal yang dipilih
+    const hist = A.owner ? [] : A.orders.filter(o => (!f || o.id_toko===f) && orderDate(o) !== tg)
       .sort((a,b) => orderDate(b).localeCompare(orderDate(a)) || String(b.waktu).localeCompare(String(a.waktu)));
     const totalBaru = list.filter(o=>o.status!=='Selesai').reduce((a,o)=>a+(Number(o.total)||0),0);
     const today = todayWIB(), nextPo = nextPreorderISO();
@@ -1246,7 +1245,7 @@ function renderAdmin(){
     <p class="hint" style="margin:0 0 12px">Pre-order ${esc(labelTanggal(tg))}: ${list.length} pesanan, ${list.filter(o=>o.status!=='Selesai').length} belum selesai (${rp(totalBaru)})</p>
     <div class="alist">${list.length ? list.map(orderCard).join('') : `<div class="empty">Belum ada pesanan untuk pre-order ${esc(labelTanggal(tg))}.</div>`}</div>
     ${hist.length ? `<div class="hist">
-      <h3 class="hist-h">${A.owner ? 'Riwayat pesanan hari ini' : 'Riwayat pesanan'} <span>${A.owner ? `${hist.length} pesanan dibuat hari ini untuk tanggal pre-order lain` : `${hist.length} pesanan di tanggal pre-order lain`}</span></h3>
+      <h3 class="hist-h">Riwayat pesanan <span>${hist.length} pesanan di tanggal pre-order lain</span></h3>
       <div class="alist" id="histList"></div>
       <div id="histMore" class="hist-more"></div>
     </div>` : ''}`;
