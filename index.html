@@ -112,6 +112,9 @@ input:focus,select:focus,textarea:focus{border-color:var(--pandan);outline:none}
 .menu .row{display:flex;align-items:center;justify-content:space-between;margin-top:auto;padding-top:8px}
 .price{font-weight:800;color:var(--pandan)}
 .menu.out{opacity:.55}
+.mnote{margin-top:8px;width:100%;box-sizing:border-box;font:inherit;font-size:.88rem;padding:8px 10px;border:1.5px dashed var(--line);border-radius:10px;background:var(--paper);color:var(--ink)}
+.mnote:focus{outline:none;border-style:solid;border-color:var(--pandan)}
+.rnote{font-size:.85rem;color:var(--muted);margin:-2px 0 6px 14px}
 .vlist{display:flex;flex-direction:column;gap:8px;margin-top:8px;padding-top:8px;border-top:1px dashed var(--line)}
 .vrow{display:flex;align-items:center;justify-content:space-between;gap:10px}
 .vrow .vn{font-weight:600;font-size:.94rem}
@@ -142,12 +145,26 @@ input:focus,select:focus,textarea:focus{border-color:var(--pandan);outline:none}
 .order-form{margin-top:26px;background:var(--card);border:1.5px solid var(--line);border-radius:var(--r-lg);padding:6px 16px 18px}
 .order-form h2{font-size:1.15rem;margin:12px 0 0}
 .notice{background:#FCEBD0;color:#6B4600;border-radius:var(--r-sm);padding:12px 14px;font-weight:600;margin:12px 0}
-.cartbar{position:fixed;left:0;right:0;bottom:0;background:var(--pandan);color:#fff;
-  padding:12px 18px calc(12px + env(safe-area-inset-bottom,0px))}
-.cartbar .in{max-width:720px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:12px}
-.cartbar small{opacity:.8;display:block}
-.cartbar b{font-size:1.15rem}
-.cartbar .btn{background:var(--kunyit);color:var(--ink)}
+.cartbar{position:fixed;left:0;right:0;bottom:0;z-index:5;background:var(--card);color:var(--ink);border-top:1.5px solid var(--line);
+  padding:12px 18px calc(14px + env(safe-area-inset-bottom,0px))}
+.cartbar .in{max-width:720px;margin:0 auto}
+.cartbar .who{display:flex;align-items:center;gap:8px}
+.cartbar .nm{display:flex;align-items:center;gap:8px;flex:1;min-width:0;margin:0;font-weight:400;font-size:1rem;background:var(--paper);border:1.5px solid var(--line);border-radius:12px;padding:0 12px;height:46px;cursor:text}
+.cartbar .nm:focus-within{border-color:var(--pandan);background:#fff}
+.cartbar .nm svg{width:18px;height:18px;flex:none;stroke:var(--muted);stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.cartbar .nm input{border:0;background:transparent;padding:0;height:42px;flex:1;min-width:0;font-weight:600;outline:none}
+.cartbar .nm input::placeholder{color:#8A9086;font-weight:400}
+.cartbar .noteb{width:46px;height:46px;flex:none;border-radius:12px;border:1.5px solid var(--line);background:var(--paper);color:var(--pandan);display:inline-flex;align-items:center;justify-content:center;position:relative;padding:0}
+.cartbar .noteb svg{width:21px;height:21px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.cartbar .noteb.on{background:var(--leaf);border-color:var(--pandan-2)}
+.cartbar .noteb.on::after{content:"";position:absolute;top:-4px;right:-4px;width:12px;height:12px;border-radius:50%;background:var(--pandan);border:2px solid #fff}
+.cartbar .err{margin:4px 0 0}
+.cartbar .err:empty{display:none}
+.cartbar .sum{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:10px}
+.cartbar small{color:var(--muted);display:block;font-size:.8rem}
+.cartbar b{font-size:1.15rem;color:var(--pandan)}
+body:has(.cartbar) .wrap{padding-bottom:190px}
+.note-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:12px}
 .head-pills{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:6px}
 .head-pills .pill{margin-top:0}
 .kbadge{display:inline-flex;align-items:center;gap:2px;border:1.5px solid var(--pandan);border-radius:999px;padding:1px 2px 1px 10px;font-size:.8rem;font-weight:700;color:var(--pandan);background:#fff;line-height:1.6}
@@ -213,6 +230,15 @@ input:focus,select:focus,textarea:focus{border-color:var(--pandan);outline:none}
 .plist-sub{font-size:.8rem;font-weight:700;color:#536471;margin:8px 0 0}
 .pl-tutup{background:#F2F2F2;color:#555;border-radius:var(--r-sm);padding:9px 12px;font-size:.88rem;font-weight:600;margin-top:12px}
 .kata-wrap{margin-top:4px}
+.kata-wrap.kw{background:#FFF8EA;border:1.5px solid #F2D9A6;border-radius:16px;padding:12px 12px 10px;margin-bottom:10px}
+.kw-hd{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.kata-wrap.kw .kw-hd label{margin:0;font-weight:700;font-size:1rem}
+.kw-hd small{color:#8A6A2A;font-size:.78rem;flex:none}
+.kw-sub{font-size:.84rem;color:#6B4600;margin:2px 0 8px}
+.kw textarea{border-color:#E7C88A}
+.kw textarea::placeholder{color:#A08758}
+.kw textarea:focus{border-color:var(--pandan)}
+.kw .kata-meta{justify-content:flex-end;color:#8A6A2A}
 .kata-wrap label{margin:6px 0 4px}
 .kata-wrap textarea{min-height:64px}
 .kata-meta{display:flex;justify-content:space-between;gap:8px;color:var(--muted);font-size:.8rem;margin-top:3px}
@@ -316,6 +342,12 @@ input:focus,select:focus,textarea:focus{border-color:var(--pandan);outline:none}
 .actions{display:flex;gap:10px;justify-content:flex-end;margin-top:20px;flex-wrap:wrap}
 .order{background:var(--card);border:1.5px solid var(--line);border-radius:var(--r-sm);padding:12px 14px}
 .order.selesai{opacity:.6}
+.hist{margin-top:28px;padding-top:18px;border-top:1.5px dashed var(--line)}
+.hist-h{margin:0 0 10px;font-size:1.05rem}
+.hist-h span{display:block;font-weight:400;color:var(--muted);font-size:.85rem}
+.hist-day{font-weight:700;font-size:.9rem;color:var(--pandan);margin:8px 0 -2px}
+.hist-day span{font-weight:400;color:var(--muted);margin-left:4px}
+.hist-more{display:flex;justify-content:center;margin-top:14px}
 .order .top{display:flex;justify-content:space-between;gap:8px;align-items:baseline}
 .order .top b{font-size:1rem}
 .order .when{color:var(--muted);font-size:.82rem}
@@ -338,6 +370,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--pandan);outline:none}
   .queue li:nth-child(2){animation-delay:.04s}.queue li:nth-child(3){animation-delay:.08s}.queue li:nth-child(4){animation-delay:.12s}
   @keyframes rise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 }
+
 </style>
 </head>
 <body>
@@ -350,7 +383,7 @@ const API_URL = 'https://script.google.com/macros/s/AKfycbxWXi3LDOOT-x1nIlx1usib
 const HARI = ['senin','selasa','rabu','kamis','jumat','sabtu','minggu'];
 const NAMA_HARI = ['Senin','Selasa','Rabu','Kamis','Jumat','Sabtu','Minggu'];
 // Nomor versi aplikasi: NAIKKAN setiap commit baru, supaya link di WhatsApp selalu memuat versi terbaru
-const APP_VERSION = 15;
+const APP_VERSION = 16;
 // GIF dari GIPHY (Tahap 3). Isi dengan API key dari developers.giphy.com; jika kosong, tombol GIF tidak tampil.
 const GIPHY_KEY = 'KcRPPFgSKTC5f03MRwfUscnMNjfWfrun';
 const GIF_RE = /^https:\/\/(media\d*|i)\.giphy\.com\/[A-Za-z0-9\/_.\-]+\.(gif|webp)$/;
@@ -574,10 +607,21 @@ function waktuLalu(iso){
   if (!iso) return '';
   const t = new Date(String(iso).slice(0,19) + '+07:00'); if (isNaN(t)) return '';
   const m = Math.max(0, Math.round((Date.now() - t.getTime()) / 60000));
-  if (m < 1) return 'baru';
-  if (m < 60) return m + 'm';
-  const j = Math.floor(m / 60); if (j < 24) return j + 'j';
-  return Math.floor(j / 24) + 'h';
+  // Hari yang sama (WIB): waktu relatif. Beda tanggal: tampilkan hari/tanggal dan jam supaya tidak membingungkan
+  const tglWIB = d => new Intl.DateTimeFormat('en-CA', { timeZone:'Asia/Jakarta', year:'numeric', month:'2-digit', day:'2-digit' }).format(d);
+  const hariIni = tglWIB(new Date()), tglPesan = tglWIB(t);
+  if (tglPesan === hariIni){
+    if (m < 1) return 'baru';
+    if (m < 60) return m + 'm';
+    return Math.floor(m / 60) + 'j';
+  }
+  const jam = String(iso).slice(11,16).replace(':', '.');
+  const [y,mo,d] = tglPesan.split('-').map(Number), [hy,hm,hd] = hariIni.split('-').map(Number);
+  const selisih = Math.round((Date.UTC(hy,hm-1,hd) - Date.UTC(y,mo-1,d)) / 86400000);
+  if (selisih === 1) return 'kemarin ' + jam;
+  const HARI3 = ['Min','Sen','Sel','Rab','Kam','Jum','Sab'];
+  const label = HARI3[new Date(Date.UTC(y,mo-1,d)).getUTCDay()] + ', ' + d + ' ' + BLN[mo-1] + (y !== hy ? ' ' + y : '');
+  return label + ' ' + jam;
 }
 const menuRingkas = items => (items || []).map(i => `${i.qty}x ${i.nama}`).join(', ');
 const WARNA_AV = ['#7C3AED','#0EA5E9','#F59E0B','#DB2777','#059669','#EA580C','#2563EB','#9333EA','#0D9488','#DC2626'];
@@ -838,29 +882,39 @@ function renderStore(data){
               <span class="price">${rp(m.harga)}${sisa(stokMenu(m))}</span>
               ${!m.tersedia || stokMenu(m) <= 0 ? '<span class="pill closed">Habis</span>' : canOrder ? step('', m.nama, stokMenu(m)) : ''}
             </div>`}
+            ${canOrder && avail ? `<input type="text" class="mnote hidden" data-note="${esc(m.id)}" maxlength="120" placeholder="📝 Catatan untuk ${esc(m.nama)} (opsional), mis. tidak pedas" aria-label="Catatan untuk ${esc(m.nama)}">` : ''}
           </div>
         </article>`; }).join('') : `<div class="empty">Toko ini belum punya menu.</div>`}
     </section>
-    ${canOrder && menus.length ? `
-    <form class="order-form" id="of">
-      <h2>Data pemesan</h2>
-      <label for="nama">Nama</label>
-      <input id="nama" type="text" required autocomplete="name" value="${esc(store.get('po_nama')||'')}">
-      <label for="cat">Catatan tambahan <span style="font-weight:400;color:var(--muted)">(opsional)</span></label>
-      <textarea id="cat" placeholder="Contoh: tidak pedas, sambal dipisah"></textarea>
-      <div class="err" id="oe"></div>
-    </form>` : ''}
   </div>
   ${canOrder && menus.length ? `
   <div class="cartbar"><div class="in">
-    <div><small id="cnt">Belum ada menu dipilih</small><b id="tot">${rp(0)}</b></div>
-    <button class="btn" id="send" disabled>Kirim pesanan</button>
+    <div class="who">
+      <label class="nm" for="nama"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v1"/></svg><input id="nama" type="text" autocomplete="name" placeholder="Nama kamu" aria-label="Nama pemesan" value="${esc(store.get('po_nama')||'')}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4L18.5 9.5a2.8 2.8 0 0 0-4-4L4 16v4"/><path d="m13.5 6.5 4 4"/></svg></label>
+      <button type="button" class="noteb" id="noteb" aria-label="Catatan tambahan" title="Catatan tambahan"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 7h6M9 11h6M9 15h4"/></svg></button>
+    </div>
+    <div class="err" id="oe"></div>
+    <div class="sum">
+      <div><small id="cnt">Belum ada menu dipilih</small><b id="tot">${rp(0)}</b></div>
+      <button class="btn" id="send" disabled>Kirim pesanan</button>
+    </div>
   </div></div>` : ''}`;
 
   document.querySelectorAll('[data-photo]').forEach(b => b.onclick = () => showPhoto(menus.find(m => m.id === b.dataset.photo)));
   const cpy = $('#copyAngka');
   if (cpy) cpy.onclick = async () => { try { await navigator.clipboard.writeText(s.badge_angka); toast('Disalin: ' + s.badge_angka); } catch(e){ prompt('Salin angka ini:', s.badge_angka); } };
   if (!canOrder || !menus.length) return;
+  let catatanPesanan = '';
+  $('#nama').oninput = () => { $('#oe').textContent = ''; };
+  $('#noteb').onclick = () => {
+    const d = openSheet(`<h2>Catatan tambahan</h2><p class="hint" style="margin:0 0 10px">Untuk seluruh pesanan ini (opsional)</p>
+      <textarea id="cat" maxlength="500" placeholder="Contoh: diambil jam 12, titip di meja depan"></textarea>
+      <div class="note-actions"><button type="button" class="btn ghost" id="cat-del">Hapus</button><button type="button" class="btn" id="cat-ok">Simpan</button></div>`);
+    const ta = $('#cat', d); ta.value = catatanPesanan; setTimeout(() => ta.focus(), 50);
+    const simpan = v => { catatanPesanan = v; $('#noteb').classList.toggle('on', !!v); $('#noteb').setAttribute('aria-label', v ? 'Catatan tambahan (terisi)' : 'Catatan tambahan'); d.remove(); };
+    $('#cat-ok', d).onclick = () => simpan(ta.value.trim());
+    $('#cat-del', d).onclick = () => simpan('');
+  };
   const priceOf = {};
   menus.forEach(m => { priceOf[m.id + '|'] = m.harga; (m.varian||[]).forEach(v => priceOf[m.id + '|' + v.id] = v.harga); });
   const update = () => {
@@ -869,6 +923,10 @@ function renderStore(data){
     $('#cnt').textContent = n ? `${n} porsi dipilih` : 'Belum ada menu dipilih';
     $('#tot').textContent = rp(t);
     $('#send').disabled = !n;
+    document.querySelectorAll('.mnote').forEach(inp => {
+      const ada = Object.entries(qty).some(([k,v]) => v > 0 && k.split('|')[0] === inp.dataset.note);
+      inp.classList.toggle('hidden', !ada);
+    });
   };
   document.querySelectorAll('.stepper').forEach(st => {
     const id = st.dataset.id + '|' + (st.dataset.v || ''), out = st.querySelector('span');
@@ -881,14 +939,16 @@ function renderStore(data){
   });
   $('#send').onclick = () => {
     const nama = $('#nama').value.trim();
-    if (!nama){ $('#oe').textContent = 'Isi nama dulu supaya pesanan bisa dikenali.'; $('#nama').focus(); $('#nama').scrollIntoView({ block:'center' }); return; }
+    if (!nama){ $('#oe').textContent = 'Isi nama dulu supaya pesanan bisa dikenali.'; $('#nama').focus(); return; }
     $('#oe').textContent = '';
-    const catatan = $('#cat').value.trim();
+    const catatan = catatanPesanan;
     const lines = [];
     Object.entries(qty).filter(([,v])=>v>0).forEach(([k,q]) => {
       const [mid, vid] = k.split('|'); const m = menus.find(x => x.id === mid); if (!m) return;
       const v = vid ? (m.varian||[]).find(x => x.id === vid) : null;
-      lines.push({ id: mid, varian_id: vid, qty: q, nama: m.nama + (v ? ' (' + v.nama + ')' : ''), harga: v ? v.harga : m.harga });
+      const ni = [...document.querySelectorAll('.mnote')].find(x => x.dataset.note === mid);
+      const cn = ni ? ni.value.trim().slice(0, 120) : '';
+      lines.push({ id: mid, varian_id: vid, qty: q, nama: m.nama + (v ? ' (' + v.nama + ')' : ''), harga: v ? v.harga : m.harga, catatan: cn });
     });
     const total = lines.reduce((a,l) => a + l.qty*l.harga, 0);
     const box = document.createElement('div'); box.className = 'recap';
@@ -896,7 +956,7 @@ function renderStore(data){
       <h2 id="rc-t">Rekap pesanan</h2>
       <p class="sub">${esc(s.nama)} · Pre-order untuk ${esc(poOf(s).label)}</p>
       <div class="card">
-        ${lines.map(l => `<div class="line"><span>${l.qty}× ${esc(l.nama)}</span><span>${rp(l.qty*l.harga)}</span></div>`).join('')}
+        ${lines.map(l => `<div class="line"><span>${l.qty}× ${esc(l.nama)}</span><span>${rp(l.qty*l.harga)}</span></div>${l.catatan?`<div class="rnote">📝 ${esc(l.catatan)}</div>`:''}`).join('')}
         <div class="line tot"><span>Total</span><span>${rp(total)}</span></div>
       </div>
       <div class="card">
@@ -904,12 +964,14 @@ function renderStore(data){
         ${catatan ? `<div class="kv"><span>Catatan:</span> ${esc(catatan)}</div>` : ''}
         ${s.waktu_ambil ? `<div class="kv"><span>Ambil:</span> ${esc(fmtWaktu(s.waktu_ambil))}</div>` : ''}
       </div>
-      <div class="kata-wrap">
-        <label for="rc-kata">💬 Kata-kata hari ini <span style="font-weight:400;color:var(--muted)">(opsional)</span></label>
-        <div class="kata-box"><textarea id="rc-kata" maxlength="500" placeholder="${esc(['Lagi pengin apa hari ini?','Semangat buat hari ini!','Rekomendasi menu favoritmu?','Cerita singkat hari ini…'][Math.floor(Math.random()*4)])}"></textarea>
+      <div class="kata-wrap kw">
+        <div class="kw-hd"><label for="rc-kata">Kata-kata hari ini</label><small>opsional</small></div>
+        <p class="kw-sub">${(() => { const hr = todayWIB(), n = ((ALL && ALL.feed) || []).filter(f => String(f.waktu||'').slice(0,10) === hr && (f.kata || f.gif)).length;
+          return n ? `${n} teman sudah berbagi hari ini. Kata-katamu tampil di timeline bersama pesananmu.` : 'Jadilah yang pertama berbagi hari ini. Kata-katamu tampil di timeline bersama pesananmu.'; })()}</p>
+        <div class="kata-box"><textarea id="rc-kata" maxlength="500" placeholder="Tulis kata-katamu hari ini"></textarea>
           ${gifAktif() ? `<button type="button" class="gif-btn" id="rc-gifbtn" aria-label="Tambah GIF" title="Tambah GIF"><svg viewBox="0 0 24 24"><path d="M15.5 3H5a2 2 0 0 0-2 2v14c0 1.1.9 2 2 2h14a2 2 0 0 0 2-2V8.5L15.5 3Z"/><path d="M14 3v4a2 2 0 0 0 2 2h4"/><path d="M8 13h.01"/><path d="M16 13h.01"/><path d="M10 16s.8 1 2 1c1.3 0 2-1 2-1"/></svg></button>` : ''}</div>
         <div id="rc-gif"></div>
-        <div class="kata-meta"><span>Tampil di timeline untuk semua orang.</span><span id="rc-count">0/500</span></div>
+        <div class="kata-meta"><span id="rc-count">0/500</span></div>
       </div>
       <div class="err" id="rc-e"></div>
       <div class="actions">
@@ -933,7 +995,7 @@ function renderStore(data){
       const b = $('#rc-send', box); sending = true; b.disabled = true; $('#rc-back', box).disabled = true; b.textContent = 'Mengirim…'; $('#rc-e', box).textContent = '';
       try {
         const kata = ($('#rc-kata', box).value || '').trim().slice(0, 500);
-        const res = await api('placeOrder', { id_toko: s.id, nama, catatan, kata, gif, items: lines.map(l => ({ id: l.id, varian_id: l.varian_id, qty: l.qty })) });
+        const res = await api('placeOrder', { id_toko: s.id, nama, catatan, kata, gif, items: lines.map(l => ({ id: l.id, varian_id: l.varian_id, qty: l.qty, catatan: l.catatan })) });
         store.set('po_nama', nama);
         if (res.preorder && ALL) { ALL.po = res.preorder; }
         markOrdered(s.id); refreshAll().catch(()=>{});
@@ -1021,7 +1083,7 @@ function viewDone(s, res, nama, catatan){
         <div class="line"><span>Pre-order untuk</span><b>${esc(po)}</b></div>
         ${res.waktu_ambil?`<div class="line"><span>Ambil</span><b>${esc(fmtWaktu(res.waktu_ambil))}</b></div>`:''}
         <div style="height:8px"></div>
-        ${res.items.map(i=>`<div class="line"><span>${i.qty}× ${esc(i.nama)}</span><span>${rp(i.qty*i.harga)}</span></div>`).join('')}
+        ${res.items.map(i=>`<div class="line"><span>${i.qty}× ${esc(i.nama)}</span><span>${rp(i.qty*i.harga)}</span></div>${i.catatan?`<div class="rnote">📝 ${esc(i.catatan)}</div>`:''}`).join('')}
         <div class="line tot"><span>Total</span><span>${rp(res.total)}</span></div>
       </div>
       <div class="share-note" role="note"><span class="ic" aria-hidden="true">💬</span><span><b>Kabari teman-teman di grup supaya mereka ikut pesan.</b>Pilih grupnya setelah WhatsApp terbuka.</span></div>
@@ -1146,11 +1208,13 @@ function renderAdmin(){
     if (!A.filterTanggal) A.filterTanggal = todayWIB();
     const f = A.filterToko, tg = A.filterTanggal;
     const list = A.orders.filter(o => (!f || o.id_toko===f) && orderDate(o) === tg);
+    const hist = A.orders.filter(o => (!f || o.id_toko===f) && orderDate(o) !== tg)
+      .sort((a,b) => orderDate(b).localeCompare(orderDate(a)) || String(b.waktu).localeCompare(String(a.waktu)));
     const totalBaru = list.filter(o=>o.status!=='Selesai').reduce((a,o)=>a+(Number(o.total)||0),0);
     const today = todayWIB(), nextPo = nextPreorderISO();
     p.innerHTML = `
     <div class="panel-head"><h2>Pesanan</h2><div class="btns">
-      <button class="btn small" onclick="openRekap()">Rekap</button>
+      <button class="btn small ghost" onclick="openRekap()">Rekap</button>
       <button class="btn small ghost" onclick="loadAdmin().then(()=>toast('Data diperbarui'))">Muat ulang</button></div></div>
     <div class="filters">
       <input type="date" id="fd" value="${esc(tg)}" aria-label="Tanggal pre-order">
@@ -1162,21 +1226,50 @@ function renderAdmin(){
       ${[...new Set(A.stores.filter(x => x.po && x.po.custom && (!f || x.id===f)).map(x => x.po.iso))].filter(d => d!==today && d!==nextPo).sort().map(d => `<button data-d="${d}" class="${tg===d?'on':''}">PO custom (${esc(labelPendek(d))})</button>`).join('')}
     </div>
     <p class="hint" style="margin:0 0 12px">Pre-order ${esc(labelTanggal(tg))}: ${list.length} pesanan, ${list.filter(o=>o.status!=='Selesai').length} belum selesai (${rp(totalBaru)})</p>
-    <div class="alist">${list.length ? list.map(o => `
+    <div class="alist">${list.length ? list.map(orderCard).join('') : `<div class="empty">Belum ada pesanan untuk pre-order ${esc(labelTanggal(tg))}.</div>`}</div>
+    ${hist.length ? `<div class="hist">
+      <h3 class="hist-h">Riwayat pesanan <span>${hist.length} pesanan di tanggal pre-order lain</span></h3>
+      <div class="alist" id="histList"></div>
+      <div id="histMore" class="hist-more"></div>
+    </div>` : ''}`;
+    const histKey = f + '|' + tg;
+    if (A.histKey !== histKey){ A.histKey = histKey; A.histN = HIST_BATCH; }
+    if (hist.length) renderHist(hist);
+    $('#ft').onchange = e => { A.filterToko = e.target.value; renderAdmin(); };
+    $('#fd').onchange = e => { A.filterTanggal = e.target.value || todayWIB(); renderAdmin(); };
+    p.querySelectorAll('.quick button').forEach(b => b.onclick = () => { A.filterTanggal = b.dataset.d; renderAdmin(); });
+  }
+}
+const HIST_BATCH = 20;
+const orderCard = o => `
       <div class="order ${o.status==='Selesai'?'selesai':''}">
         <div class="top"><b>${esc(o.nama_pemesan)}</b><span class="when">${esc(fmtWaktu(o.waktu))}</span></div>
         <div class="meta" style="color:var(--muted);font-size:.85rem">${esc(o.nama_toko)} · ${esc(o.id)}</div>
         <div class="items">${esc(o.ringkasan)}</div>
         ${o.catatan?`<div class="note">${esc(o.catatan)}</div>`:''}
-        ${(o.kata_hari_ini||gifAman(o.gif))?`<div class="note" style="background:#FFF8EA;${o.kata_sembunyi==='TRUE'?'opacity:.55;':''}"><span style="${o.kata_sembunyi==='TRUE'?'text-decoration:line-through':''}">${o.kata_hari_ini?`💬 “${esc(o.kata_hari_ini)}”`:'💬 (tanpa kata-kata)'}</span>${o.kata_sembunyi==='TRUE'?'<span class="kata-tag">Disembunyikan</span>':''}
-          ${gifAman(o.gif)?`<span class="gif-a"><img src="${esc(o.gif)}" alt="GIF" loading="lazy"><span>GIF</span></span>`:''}
-          ${A.owner?'':`<button class="link" style="font-size:.82rem;margin-left:6px" onclick="toggleKata('${esc(o.id)}')">${o.kata_sembunyi==='TRUE'?'Tampilkan di timeline':'Sembunyikan dari timeline'}</button>`}</div>`:''}
         <div class="bottom"><b>${rp(o.total)}</b>
           <button class="btn small ${o.status==='Selesai'?'ghost':''}" onclick="toggleOrder('${esc(o.id)}')">${o.status==='Selesai'?'Tandai belum selesai':'Tandai selesai'}</button></div>
-      </div>`).join('') : `<div class="empty">Belum ada pesanan untuk pre-order ${esc(labelTanggal(tg))}.</div>`}</div>`;
-    $('#ft').onchange = e => { A.filterToko = e.target.value; renderAdmin(); };
-    $('#fd').onchange = e => { A.filterTanggal = e.target.value || todayWIB(); renderAdmin(); };
-    p.querySelectorAll('.quick button').forEach(b => b.onclick = () => { A.filterTanggal = b.dataset.d; renderAdmin(); });
+      </div>`;
+/* Riwayat pesanan: tampil bertahap (lazy load) per HIST_BATCH pesanan, dikelompokkan per tanggal pre-order */
+function renderHist(hist){
+  const box = $('#histList'), more = $('#histMore'); if (!box || !more) return;
+  if (A.histObs){ A.histObs.disconnect(); A.histObs = null; }
+  const n = Math.min(A.histN || HIST_BATCH, hist.length);
+  let html = '', last = '';
+  hist.slice(0, n).forEach(o => {
+    const d = orderDate(o);
+    if (d !== last){ last = d; const sub = hist.filter(x => orderDate(x) === d);
+      html += `<div class="hist-day">${esc(labelTanggal(d))} <span>${sub.length} pesanan · ${rp(sub.reduce((a,x)=>a+(Number(x.total)||0),0))}</span></div>`; }
+    html += orderCard(o);
+  });
+  box.innerHTML = html;
+  if (n >= hist.length){ more.innerHTML = `<p class="hint" style="text-align:center;margin:14px 0 0">Semua riwayat sudah ditampilkan</p>`; return; }
+  more.innerHTML = `<button class="btn small ghost" type="button">Muat lebih banyak (${hist.length - n} lagi)</button>`;
+  const next = () => { A.histN = n + HIST_BATCH; renderHist(hist); };
+  more.querySelector('button').onclick = next;
+  if ('IntersectionObserver' in window){
+    A.histObs = new IntersectionObserver(es => { if (es.some(e => e.isIntersecting)) next(); }, { rootMargin: '300px 0px' });
+    A.histObs.observe(more);
   }
 }
 
@@ -1225,7 +1318,7 @@ function rekapText(storeId, tg){
       if (it.varian_id && m) varian = ((m.varian||[]).find(v => v.id === it.varian_id) || {}).nama || '';
       if (!varian) { const mm = String(it.nama).match(/\(([^)]*)\)$/); if (mm && it.varian_id) varian = mm[1]; }
       if (!groups.has(key)) groups.set(key, { nama, rows: [] });
-      groups.get(key).rows.push({ pemesan: o.nama_pemesan, varian, qty: it.qty });
+      groups.get(key).rows.push({ pemesan: o.nama_pemesan, varian, qty: it.qty, catatan: String(it.catatan||'').trim() });
     });
   });
   const [y,m,d] = tg.split('-').map(Number);
@@ -1236,7 +1329,7 @@ function rekapText(storeId, tg){
   keys.forEach(k => {
     const g = groups.get(k);
     parts.push(`*${g.nama}*`);
-    g.rows.forEach((r,i) => parts.push(`${i+1}. ${[r.pemesan, r.varian].filter(Boolean).join(' - ')}${r.qty>1?` (${r.qty}x)`:''}`));
+    g.rows.forEach((r,i) => parts.push(`${i+1}. ${[r.pemesan, r.varian].filter(Boolean).join(' - ')}${r.qty>1?` (${r.qty}x)`:''}${r.catatan?` _(${r.catatan})_`:''}`));
     parts.push('');
   });
   // Catatan ditulis sekali per pesanan, di bagian tersendiri
