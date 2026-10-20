@@ -397,7 +397,7 @@ const API_URL = 'https://script.google.com/macros/s/AKfycbxWXi3LDOOT-x1nIlx1usib
 const HARI = ['senin','selasa','rabu','kamis','jumat','sabtu','minggu'];
 const NAMA_HARI = ['Senin','Selasa','Rabu','Kamis','Jumat','Sabtu','Minggu'];
 // Nomor versi aplikasi: NAIKKAN setiap commit baru, supaya link di WhatsApp selalu memuat versi terbaru
-const APP_VERSION = 16;
+const APP_VERSION = 17;
 // GIF dari GIPHY (Tahap 3). Isi dengan API key dari developers.giphy.com; jika kosong, tombol GIF tidak tampil.
 const GIPHY_KEY = 'KcRPPFgSKTC5f03MRwfUscnMNjfWfrun';
 const GIF_RE = /^https:\/\/(media\d*|i)\.giphy\.com\/[A-Za-z0-9\/_.\-]+\.(gif|webp)$/;
@@ -641,10 +641,11 @@ const menuRingkas = items => (items || []).map(i => `${i.qty}x ${i.nama}`).join(
 const WARNA_AV = ['#7C3AED','#0EA5E9','#F59E0B','#DB2777','#059669','#EA580C','#2563EB','#9333EA','#0D9488','#DC2626'];
 function warnaNama(n){ let h = 0; for (const c of String(n)) h = (h * 31 + c.charCodeAt(0)) >>> 0; return WARNA_AV[h % WARNA_AV.length]; }
 const avatar = n => `<span class="av" style="background:${warnaNama(n)}" aria-hidden="true">${esc(String(n).trim().charAt(0) || '?')}</span>`;
-// Pemesan di warung yang sama yang memesan SEBELUM postingan ini (feed urut terbaru di atas)
+// Pemesan di warung yang sama, pada HARI YANG SAMA (WIB), yang memesan SEBELUM postingan ini (feed urut terbaru di atas)
+const hariPesan = x => String(x.waktu || '').slice(0, 10);
 function pemesanSebelum(f){
   const feed = (ALL && ALL.feed) || []; const i = feed.findIndex(x => x.id === f.id);
-  return feed.slice(i + 1).filter(x => x.id_toko === f.id_toko);
+  return feed.slice(i + 1).filter(x => x.id_toko === f.id_toko && hariPesan(x) === hariPesan(f));
 }
 // "bersama X, Y, dan N lainnya" (nama depan, hanya pemesan sebelumnya). Kosong = pemesan pertama.
 function teksBersama(seb){
@@ -656,7 +657,9 @@ function teksBersama(seb){
 // Baris "bersama" untuk pesan WhatsApp setelah memesan. Jika feed belum memuat pesanan ini, semua pesanan di feed dianggap sebelumnya.
 function barisBersamaWA(idToko, idPesanan){
   const feed = (ALL && ALL.feed) || []; const i = feed.findIndex(x => x.id === idPesanan);
-  const seb = (i >= 0 ? feed.slice(i + 1) : feed).filter(x => x.id_toko === idToko && x.id !== idPesanan);
+  const hari = i >= 0 ? hariPesan(feed[i]) : todayWIB();
+  const seb = (i >= 0 ? feed.slice(i + 1) : feed).filter(x => x.id_toko === idToko && x.id !== idPesanan && hariPesan(x) === hari);
+  if (!seb.length) return ' _Pemesan pertama di warung ini hari ini_';
   return seb.length ? `👥 _${teksBersama(seb)}_` : '🎉 _Pemesan pertama di warung ini_';
 }
 /* --- Rekomendasi warung lain (muncul setelah 4 pesanan berturut-turut di warung yang sama) --- */
@@ -733,7 +736,7 @@ function renderTimeline(){
       const sisipan = runN % 4 === 0 ? postRek(f.id_toko, sudah, f.id + '|' + (ALL.po && ALL.po.iso), kal) : '';
       const seb = pemesanSebelum(f);
       const stk = `<span class="stk">${[...new Set(seb.map(x => x.nama))].slice(0, 3).map(avatar).join('')}</span>`;
-      const teks = !seb.length ? '🎉 Pemesan pertama di warung ini' : `${stk}<span>${esc(teksBersama(seb))} ›</span>`;
+      const teks = !seb.length ? '🎉 Pemesan pertama hari ini di warung ini' : `${stk}<span>${esc(teksBersama(seb))} ›</span>`;
       return `<li class="post">${avatar(f.nama)}<div class="bd">
         <div class="top"><b title="${esc(f.nama)}">${esc(f.nama)}</b><span class="h">·</span><button type="button" data-go="${esc(f.id_toko)}" title="${esc(f.nama_toko)}">${esc(f.nama_toko)}</button><span class="t">· ${esc(waktuLalu(f.waktu))}</span></div>
         ${f.kata ? `<div class="txt${tlBuka.has(f.id) ? '' : ' clamp'}">${esc(f.kata)}</div>${tlBuka.has(f.id) ? '' : `<button type="button" class="sel" data-sel="${esc(f.id)}" hidden>Selengkapnya</button>`}` : ''}
