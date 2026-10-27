@@ -194,6 +194,7 @@ body:has(.cartbar) .wrap{padding-bottom:190px}
 .tl ul{list-style:none;margin:0;padding:0}
 .post{display:flex;gap:10px;padding:12px 16px;border-bottom:1px solid #EFF3F4;color:#0F1419}
 .post:last-child{border-bottom:0}
+.tl-day{position:sticky;top:0;z-index:1;padding:12px 16px;text-align:center;background:#F7F9F9;border-bottom:1px solid #EFF3F4;color:#536471;font-size:.8rem;font-weight:700;letter-spacing:.01em}
 .av{width:40px;height:40px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:1rem;text-transform:uppercase}
 .post .bd{flex:1;min-width:0}
 .post .top{display:flex;gap:4px;align-items:baseline;flex-wrap:nowrap;min-width:0;font-size:.92rem;line-height:1.3}
@@ -238,7 +239,6 @@ body:has(.cartbar) .wrap{padding-bottom:190px}
 .plist .nm b{font-size:.95rem}
 .plist .m{font-size:.84rem;color:#536471}
 .plist .ago{color:#536471;font-size:.8rem;flex:none}
-.plist li.me{background:#F1F7EE;border-radius:12px;padding:10px;border-bottom:0;margin-bottom:6px}
 .plist .me-tag{font-size:.72rem;font-weight:700;color:var(--pandan);background:#fff;border:1px solid #CFE3C6;border-radius:999px;padding:0 7px;margin-left:4px}
 .plist .cat{font-size:.82rem;color:#6B4600;margin-top:2px}
 .plist-sub{font-size:.8rem;font-weight:700;color:#536471;margin:8px 0 0}
@@ -298,8 +298,8 @@ body:has(.cartbar) .wrap{padding-bottom:190px}
 .recap .actions .btn{flex:1}
 .btn.wa{background:#1FA855;color:#fff;width:100%;display:flex;align-items:center;justify-content:center;gap:8px;font-size:1.02rem}
 .btn.wa:hover{background:#178a45}
-.share-note{display:flex;gap:10px;align-items:flex-start;text-align:left;background:#E7F7EE;border:1.5px solid #9BD8B3;border-left:5px solid #1FA855;color:#14532D;border-radius:var(--r-sm);padding:11px 14px;font-size:.9rem;line-height:1.45;margin:4px 0 12px}
-.share-note .ic{flex:none;width:28px;height:28px;border-radius:50%;background:#1FA855;color:#fff;display:flex;align-items:center;justify-content:center;font-size:.95rem}
+.share-note{display:flex;gap:10px;align-items:flex-start;text-align:left;background:#E8F5FE;border:1.5px solid #A9D8FA;border-left:5px solid #1D9BF0;color:#0B3D66;border-radius:var(--r-sm);padding:11px 14px;font-size:.9rem;line-height:1.45;margin:4px 0 12px}
+.share-note .ic{flex:none;width:28px;height:28px;border-radius:50%;background:#1D9BF0;color:#fff;display:flex;align-items:center;justify-content:center;font-size:.95rem}
 .share-note b{display:block;font-size:.95rem;margin-bottom:1px}
 .done{text-align:center;padding:40px 10px}
 .done .tick{width:72px;height:72px;border-radius:50%;background:var(--leaf);color:var(--pandan);font-size:2.2rem;display:flex;align-items:center;justify-content:center;margin:0 auto 16px}
@@ -397,7 +397,7 @@ const API_URL = 'https://script.google.com/macros/s/AKfycbxWXi3LDOOT-x1nIlx1usib
 const HARI = ['senin','selasa','rabu','kamis','jumat','sabtu','minggu'];
 const NAMA_HARI = ['Senin','Selasa','Rabu','Kamis','Jumat','Sabtu','Minggu'];
 // Nomor versi aplikasi: NAIKKAN setiap commit baru, supaya link di WhatsApp selalu memuat versi terbaru
-const APP_VERSION = 17;
+const APP_VERSION = 18;
 // GIF dari GIPHY (Tahap 3). Isi dengan API key dari developers.giphy.com; jika kosong, tombol GIF tidak tampil.
 const GIPHY_KEY = 'KcRPPFgSKTC5f03MRwfUscnMNjfWfrun';
 const GIF_RE = /^https:\/\/(media\d*|i)\.giphy\.com\/[A-Za-z0-9\/_.\-]+\.(gif|webp)$/;
@@ -655,12 +655,11 @@ function teksBersama(seb){
   return `bersama ${nama.join(nama.length > 1 && sisa <= 0 ? ' dan ' : ', ')}${sisa > 0 ? `, dan ${sisa} lainnya` : ''}`;
 }
 // Baris "bersama" untuk pesan WhatsApp setelah memesan. Jika feed belum memuat pesanan ini, semua pesanan di feed dianggap sebelumnya.
-function barisBersamaWA(idToko, idPesanan){
+// Pemesan sebelumnya (warung & hari yang sama) untuk pesan WhatsApp setelah memesan.
+function pemesanSebelumWA(idToko, idPesanan){
   const feed = (ALL && ALL.feed) || []; const i = feed.findIndex(x => x.id === idPesanan);
   const hari = i >= 0 ? hariPesan(feed[i]) : todayWIB();
-  const seb = (i >= 0 ? feed.slice(i + 1) : feed).filter(x => x.id_toko === idToko && x.id !== idPesanan && hariPesan(x) === hari);
-  if (!seb.length) return ' _Pemesan pertama di warung ini hari ini_';
-  return seb.length ? `👥 _${teksBersama(seb)}_` : '🎉 _Pemesan pertama di warung ini_';
+  return (i >= 0 ? feed.slice(i + 1) : feed).filter(x => x.id_toko === idToko && x.id !== idPesanan && hariPesan(x) === hari);
 }
 /* --- Rekomendasi warung lain (muncul setelah 4 pesanan berturut-turut di warung yang sama) --- */
 const KALIMAT_REK = [
@@ -724,20 +723,32 @@ function semuaPilihan(kecuali){
 
 let tlBatas = 10;
 const tlBuka = new Set(); // kata-kata yang sudah dibuka lewat "Selengkapnya"
+// Label pemisah tanggal di timeline: Hari ini / Kemarin / Senin, 26 Oktober
+function labelHariTL(ymd){
+  const hi = todayWIB(); if (ymd === hi) return 'Hari ini';
+  const [y,m,d] = ymd.split('-').map(Number), [hy,hm,hd] = hi.split('-').map(Number);
+  const sel = Math.round((Date.UTC(hy,hm-1,hd) - Date.UTC(y,m-1,d)) / 86400000);
+  if (sel === 1) return 'Kemarin';
+  const BULAN = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+  return HARI_ID[new Date(Date.UTC(y,m-1,d)).getUTCDay()] + ', ' + d + ' ' + BULAN[m-1] + (y !== hy ? ' ' + y : '');
+}
 function renderTimeline(){
   const box = $('#tl'); if (!box) return;
   const feed = (ALL && ALL.feed) || [];
   const po = ALL && ALL.po && ALL.po.label ? ` · Pre-Order ${ALL.po.label}` : '';
   if (!feed.length){ box.innerHTML = `<div class="tl-hd"><h2>Baru saja memesan</h2><p class="sub">Belum ada pesanan. Jadilah yang pertama! 🎉</p></div>`; return; }
   box.innerHTML = `<div class="tl-hd"><h2>Baru saja memesan</h2><p class="sub">${feed.length} pesanan</p></div>
-    <ul>${(() => { let runToko = '', runN = 0; const sudah = new Set(), kal = new Set();
+    <ul>${(() => { let runToko = '', runN = 0, hariLalu = ''; const sudah = new Set(), kal = new Set();
       return feed.slice(0, tlBatas).map(f => {
+      // Pemisah setiap kali tanggal (WIB) postingan berganti
+      const hr = hariPesan(f), pemisah = hr && hr !== hariLalu ? `<li class="tl-day" role="separator">${esc(labelHariTL(hr))}</li>` : '';
+      if (hr) hariLalu = hr;
       if (f.id_toko === runToko) runN++; else { runToko = f.id_toko; runN = 1; }
       const sisipan = runN % 4 === 0 ? postRek(f.id_toko, sudah, f.id + '|' + (ALL.po && ALL.po.iso), kal) : '';
       const seb = pemesanSebelum(f);
       const stk = `<span class="stk">${[...new Set(seb.map(x => x.nama))].slice(0, 3).map(avatar).join('')}</span>`;
       const teks = !seb.length ? '🎉 Pemesan pertama hari ini di warung ini' : `${stk}<span>${esc(teksBersama(seb))} ›</span>`;
-      return `<li class="post">${avatar(f.nama)}<div class="bd">
+      return `${pemisah}<li class="post">${avatar(f.nama)}<div class="bd">
         <div class="top"><b title="${esc(f.nama)}">${esc(f.nama)}</b><span class="h">·</span><button type="button" data-go="${esc(f.id_toko)}" title="${esc(f.nama_toko)}">${esc(f.nama_toko)}</button><span class="t">· ${esc(waktuLalu(f.waktu))}</span></div>
         ${f.kata ? `<div class="txt${tlBuka.has(f.id) ? '' : ' clamp'}">${esc(f.kata)}</div>${tlBuka.has(f.id) ? '' : `<button type="button" class="sel" data-sel="${esc(f.id)}" hidden>Selengkapnya</button>`}` : ''}
         ${gifAman(f.gif) ? `<div class="gif"><img src="${esc(f.gif)}" alt="GIF dari ${esc(f.nama)}" loading="lazy"><span>GIF</span></div><br>` : ''}
@@ -1071,20 +1082,28 @@ function showPhoto(m){
   box.querySelector('.close').focus();
 }
 
-function waMessage(storeName, nama, po, items, bersama){
+function waMessage(storeName, nama, po, items, seb){
   const open = (ALL ? ALL.stores : []).filter(x => x.buka);
-  const url = shareUrl();
+  const url = shareUrl().replace(/^https?:\/\//, '');
   po = po || { label: preorderLabel(), custom: false };
-  const parts = [`🍱 *Pre-Order (${po.label})*`, `*${nama}* sudah pesan di ${storeName} ✅`];
-  (items || []).forEach(i => parts.push(`• ${i.qty}x ${i.nama}`));
-  if (bersama) parts.push(bersama);
-  parts.push('', 'Toko yang menerima pesanan hari ini:');
-  open.forEach((t, i) => {
-    parts.push(`${i+1}. *${t.nama}*${t.tutup_label ? ` s/d _${t.tutup_label}_` : ''}`);
-    if (t.deskripsi) parts.push(`_${t.deskripsi}_`);
-    parts.push('');
-  });
-  parts.push(`Yuk ikut pesan 👉 ${url}`);
+  const lain = [...new Set((seb || []).map(x => x.nama))].filter(n => n && n !== nama);
+  const parts = [`Pre-Order (${po.label})`, ''];
+  if (!lain.length) {
+    // Pemesan pertama di warung ini hari ini
+    parts.push(`*${nama}*:`);
+    (items || []).forEach(i => parts.push(`• ${i.qty}x ${i.nama}`));
+    parts.push(`_pesen di ${storeName}_`, '', 'Toko yang *buka* hari ini:');
+    open.forEach((t, i) => parts.push(`${i+1}. ${t.nama}${t.tutup_label ? ` _s/d ${t.tutup_label}_` : ''}`));
+  } else {
+    // Sudah ada pemesan lain: maksimal 2 nama, sisanya "dan N lainnya"
+    const tampil = lain.slice(0, 2), sisa = lain.length - tampil.length;
+    parts.push(`1. *${nama}*:`);
+    (items || []).forEach(i => parts.push(`• ${i.qty}x ${i.nama}`));
+    tampil.forEach((n, k) => parts.push(`${k+2}. *${n}*`));
+    parts.push(`_${sisa > 0 ? `dan ${sisa} lainnya juga` : 'juga'} pesen di ${storeName}_`, '', 'Toko yang *buka* hari ini:');
+    open.forEach((t, i) => parts.push(`${i+1}. ${t.nama}${t.tutup_label ? ` _s/d ${t.tutup_label}_` : ''}`));
+  }
+  parts.push('', `Selengkapnya 👉 ${url}`);
   return parts.join('\n');
 }
 
@@ -1105,13 +1124,13 @@ function viewDone(s, res, nama, catatan){
         ${res.items.map(i=>`<div class="line"><span>${i.qty}× ${esc(i.nama)}</span><span>${rp(i.qty*i.harga)}</span></div>${i.catatan?`<div class="rnote">📝 ${esc(i.catatan)}</div>`:''}`).join('')}
         <div class="line tot"><span>Total</span><span>${rp(res.total)}</span></div>
       </div>
-      <div class="share-note" role="note"><span class="ic" aria-hidden="true">💬</span><span><b>Kabari teman-teman di grup supaya mereka ikut pesan.</b>Pilih grupnya setelah WhatsApp terbuka.</span></div>
-      <button class="btn wa" id="wa" style="margin-bottom:10px">Bagikan ke grup WhatsApp</button>
+      <div class="share-note" role="note"><span class="ic" aria-hidden="true">💬</span><span><b>Bantuin warung langganan kita biar makin rame, yuk!</b>Sekalian biar yang lain juga pesen.</span></div>
+      <button class="btn wa" id="wa" style="margin-bottom:10px">Share ke grup dongs! 🙏</button>
       <button class="btn ghost" id="copy" style="width:100%;margin-bottom:10px">Salin pesan</button>
       <button class="link" onclick="location.hash==='#/'?route():go('/')">Kembali ke daftar toko</button>
     </section>
   </div>`;
-  const msg = () => waMessage(s.nama, nama, poObj, res.items, barisBersamaWA(s.id, res.id));
+  const msg = () => waMessage(s.nama, nama, poObj, res.items, pemesanSebelumWA(s.id, res.id));
   // Bagikan: langsung buka WhatsApp dengan pesan terisi. Salin: langsung menyalin pesan.
   $('#wa').onclick = () => window.open('https://wa.me/?text=' + encodeURIComponent(msg()), '_blank');
   $('#copy').onclick = async () => {
