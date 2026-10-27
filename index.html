@@ -368,6 +368,10 @@ body:has(.cartbar) .wrap{padding-bottom:190px}
 .order .items{margin:6px 0}
 .order .note{background:var(--paper);border-radius:8px;padding:6px 10px;font-size:.9rem;margin:6px 0}
 .order .bottom{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.order .acts{display:flex;gap:8px;align-items:center}
+.icon-btn{width:38px;height:38px;padding:0!important;display:inline-flex;align-items:center;justify-content:center;border-radius:50%;flex:none}
+.icon-btn svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;pointer-events:none}
+.struk{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;font-size:.85rem;line-height:1.45;background:#FFFDF6;color:#1B1E1A;border:1px dashed var(--line);border-radius:10px;padding:12px 14px;margin:12px auto 0;white-space:pre;overflow-x:auto;width:max-content;max-width:100%}
 .filters{display:flex;gap:8px;margin-bottom:12px}
 .filters select{flex:1}
 .filters input[type=date]{flex:1;min-width:0;padding:10px 12px}
@@ -397,7 +401,7 @@ const API_URL = 'https://script.google.com/macros/s/AKfycbxWXi3LDOOT-x1nIlx1usib
 const HARI = ['senin','selasa','rabu','kamis','jumat','sabtu','minggu'];
 const NAMA_HARI = ['Senin','Selasa','Rabu','Kamis','Jumat','Sabtu','Minggu'];
 // Nomor versi aplikasi: NAIKKAN setiap commit baru, supaya link di WhatsApp selalu memuat versi terbaru
-const APP_VERSION = 18;
+const APP_VERSION = 19;
 // GIF dari GIPHY (Tahap 3). Isi dengan API key dari developers.giphy.com; jika kosong, tombol GIF tidak tampil.
 const GIPHY_KEY = 'KcRPPFgSKTC5f03MRwfUscnMNjfWfrun';
 const GIF_RE = /^https:\/\/(media\d*|i)\.giphy\.com\/[A-Za-z0-9\/_.\-]+\.(gif|webp)$/;
@@ -737,7 +741,8 @@ function renderTimeline(){
   const feed = (ALL && ALL.feed) || [];
   const po = ALL && ALL.po && ALL.po.label ? ` · Pre-Order ${ALL.po.label}` : '';
   if (!feed.length){ box.innerHTML = `<div class="tl-hd"><h2>Baru saja memesan</h2><p class="sub">Belum ada pesanan. Jadilah yang pertama! 🎉</p></div>`; return; }
-  box.innerHTML = `<div class="tl-hd"><h2>Baru saja memesan</h2><p class="sub">${feed.length} pesanan</p></div>
+  const nHariIni = feed.filter(x => hariPesan(x) === todayWIB()).length; // hanya pesanan hari ini (WIB)
+  box.innerHTML = `<div class="tl-hd"><h2>Baru saja memesan</h2>${nHariIni ? `<p class="sub">${nHariIni} pesanan hari ini</p>` : ''}</div>
     <ul>${(() => { let runToko = '', runN = 0, hariLalu = ''; const sudah = new Set(), kal = new Set();
       return feed.slice(0, tlBatas).map(f => {
       // Pemisah setiap kali tanggal (WIB) postingan berganti
@@ -1286,8 +1291,9 @@ const orderCard = o => `
         <div class="meta" style="color:var(--muted);font-size:.85rem">${esc(o.nama_toko)} · ${esc(o.id)}</div>
         <div class="items">${esc(o.ringkasan)}</div>
         ${o.catatan?`<div class="note">${esc(o.catatan)}</div>`:''}
-        <div class="bottom"><b>${rp(o.total)}</b>
-          <button class="btn small ${o.status==='Selesai'?'ghost':''}" onclick="toggleOrder('${esc(o.id)}')">${o.status==='Selesai'?'Tandai belum selesai':'Tandai selesai'}</button></div>
+        <div class="bottom"><b>${rp(o.total)}</b><div class="acts">
+          <button type="button" class="btn small ghost icon-btn" onclick="kirimStruk('${esc(o.id)}')" aria-label="Kirim struk ke WhatsApp" title="Kirim struk"><svg viewBox="0 0 24 24"><path d="M5 3h14v18l-2.3-1.5L14.3 21 12 19.5 9.7 21l-2.4-1.5L5 21z"/><path d="M8.5 8h7M8.5 11.5h7M8.5 15h4"/></svg></button>
+          <button class="btn small ${o.status==='Selesai'?'ghost':''}" onclick="toggleOrder('${esc(o.id)}')">${o.status==='Selesai'?'Tandai belum selesai':'Tandai selesai'}</button></div></div>
       </div>`;
 /* Riwayat pesanan: tampil bertahap (lazy load) per HIST_BATCH pesanan, dikelompokkan per tanggal pre-order */
 function renderHist(hist){
@@ -1416,6 +1422,65 @@ async function toggleOrder(id){
   const prev = o.status; o.status = status; renderAdmin();
   try { await api(act('setOrderStatus'), { id, status }); }
   catch(err){ o.status = prev; renderAdmin(); toast('Gagal menyimpan: ' + err.message); }
+}
+
+/* --- Struk pesanan (monospace, untuk dikirim lewat WhatsApp) --- */
+const STRUK_W = 26;
+function strukText(o){
+  const W = STRUK_W, garis = '-'.repeat(W);
+  const num = n => Number(n || 0).toLocaleString('id-ID');
+  // Pecah teks panjang per kata supaya tidak melebihi lebar struk
+  const wrap = (s, first = '', next = first) => {
+    const out = []; let line = first, ada = false;
+    String(s || '').trim().split(/\s+/).filter(Boolean).forEach(w => {
+      while (w.length > W - next.length) { // kata yang terlalu panjang dipotong paksa
+        if (ada) { out.push(line); line = next; ada = false; }
+        out.push(line + w.slice(0, W - line.length)); w = w.slice(W - line.length); line = next;
+      }
+      if (!w) return;
+      if (ada && line.length + 1 + w.length > W) { out.push(line); line = next + w; }
+      else line += (ada ? ' ' : '') + w;
+      ada = true;
+    });
+    if (ada) out.push(line);
+    return out;
+  };
+  const tengah = s => wrap(s).map(l => ' '.repeat(Math.max(0, Math.floor((W - l.length) / 2))) + l);
+  const kanan = (l, v) => l + ' '.repeat(Math.max(1, W - l.length - v.length)) + v;
+  const iso = orderDate(o); const [y, m, d] = iso.split('-').map(Number);
+  const HARI3 = ['Min','Sen','Sel','Rab','Kam','Jum','Sab'];
+  const tgl = y ? `${HARI3[new Date(Date.UTC(y, m - 1, d)).getUTCDay()]}, ${d} ${BLN[m - 1]} ${y}` : iso;
+  const L = [...tengah(String(o.nama_toko || '').toUpperCase()), ...tengah('Pre-Order F&B'), garis,
+    ...wrap(o.id, 'No   ', '     '), ...wrap(o.nama_pemesan, 'Nama ', '     '), ...wrap(tgl, 'PO   ', '     '), garis];
+  (o.items || []).forEach(it => {
+    L.push(...wrap(it.nama));
+    const harga = Number(it.harga) || 0, qty = Number(it.qty) || 0;
+    L.push(harga ? kanan(` ${qty}x${num(harga)}`, num(qty * harga)) : ` ${qty}x`);
+    if (String(it.catatan || '').trim()) L.push(...wrap(it.catatan, ' *', '  '));
+  });
+  L.push(garis, kanan('TOTAL', 'Rp' + num(o.total)));
+  if (String(o.catatan || '').trim()) L.push(garis, ...wrap(o.catatan, 'Catatan: ', ''));
+  L.push(...tengah('Terima kasih!'));
+  return L.join('\n');
+}
+function kirimStruk(id){
+  const o = A.orders.find(x => x.id === id); if (!o) return;
+  const isi = strukText(o), pesan = '```\n' + isi + '\n```';
+  const d = openSheet(`
+    <h2>Struk pesanan</h2>
+    <p class="hint" style="margin:0">${esc(o.nama_pemesan)} · ${esc(o.id)}</p>
+    <pre class="struk">${esc(isi)}</pre>
+    <div class="actions">
+      <button type="button" class="btn small ghost" id="st_close">Tutup</button>
+      <button type="button" class="btn small ghost" id="st_copy">Salin</button>
+      <button type="button" class="btn small wa" id="st_wa">Bagikan ke WhatsApp</button>
+    </div>`);
+  $('#st_close', d).onclick = () => d.remove();
+  $('#st_wa', d).onclick = () => window.open('https://wa.me/?text=' + encodeURIComponent(pesan), '_blank');
+  $('#st_copy', d).onclick = async () => {
+    try { await navigator.clipboard.writeText(pesan); toast('Struk disalin. Tempel di WhatsApp.'); }
+    catch(e){ prompt('Salin struk ini:', pesan); }
+  };
 }
 
 /* --- unggah foto (dikompres di browser) --- */
